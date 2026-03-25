@@ -44,7 +44,7 @@ const Navbar = () => {
             ]
         },
         {
-            name: 'Earn with inDrive',
+            name: 'Earn with Us',
             href: '/earn',
             largeIcon: FaDollarSign,
             hasDropdown: true,
@@ -180,7 +180,7 @@ const Navbar = () => {
                     <div className="flex justify-between items-center">
                         {/* Logo */}
                         <a href="/" className="flex items-center gap-3 group">
-                            <span className="text-2xl font-bold text-red-600 tracking-wide">
+                            <span className="text-2xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
                                 RIDEN
                             </span>
                         </a>
@@ -198,17 +198,17 @@ const Navbar = () => {
                                 >
                                     <a
                                         href={link.href}
-                                        className="relative px-5 py-2 group block"
+                                        className="relative px-3 py-2 group block"
                                     >
                                         <span className={`relative z-10 text-sm tracking-wide transition-colors duration-300 ${activeDropdown === link.name
-                                            ? 'text-red-600'
-                                            : 'text-gray-700 group-hover:text-red-600'
+                                            ? 'text-[#FF161F]'
+                                            : 'text-gray-700 group-hover:text-[#FF161F]'
                                             }`}>
                                             {link.name}
                                         </span>
 
                                         {/* Elegant underline */}
-                                        <span className={`absolute bottom-0 left-1/2 w-0 h-0.5 bg-red-600 transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${activeDropdown === link.name ? 'w-4/5' : ''
+                                        <span className={`absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-[#FF161F] to-[#AD343E] transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${activeDropdown === link.name ? 'w-4/5' : ''
                                             }`}></span>
                                     </a>
                                 </div>
@@ -218,21 +218,18 @@ const Navbar = () => {
                         {/* Get App Button - Desktop */}
                         <div className="hidden lg:block">
                             <button className="relative overflow-hidden group">
-                                <div className="relative px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300">
-                                    <span className="text-sm tracking-wide flex items-center gap-2">
-                                        <FaDownload className="text-sm" />
-                                        Get the App
-                                    </span>
+                                <div className="relative px-6 py-2.5 font-medium uppercase bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-lg hover:bg-red-700 transition-all duration-300">
+                                    Download App
                                 </div>
                             </button>
                         </div>
 
                         {/* Mobile Menu Button */}
                         <div className="lg:hidden flex items-center gap-3">
-                            <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300">
-                                <span className="text-sm font-light flex items-center gap-2">
-                                    <FaDownload />
-                                    <span className="hidden xs:inline">Get App</span>
+                            <button className="px-4 py-2 bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-lg hover:opacity-90 transition-all duration-300">
+                                <span className="text-sm font-medium uppercase flex items-center gap-2">
+                                    <span className="hidden xs:inline">Download App</span>
+                                    <span className="xs:hidden">Get App</span>
                                 </span>
                             </button>
 
@@ -275,12 +272,12 @@ const Navbar = () => {
                                             <div key={link.name} className="grid grid-cols-2 gap-16">
                                                 {/* Left Side - Title and Large Icon */}
                                                 <div className="space-y-6 relative">
-                                                    <h2 className="text-4xl font-bold text-gray-900 z-20">
+                                                    <h2 className="text-3xl font-bold text-gray-900 z-20 font-audiowide uppercase">
                                                         {link.name}
                                                     </h2>
 
                                                     <div className="text-center">
-                                                        <div className="text-[35rem] text-red-600/20 absolute -top-20 right-0 z-10">
+                                                        <div className="text-[35rem] text-[#FF161F]/10 absolute -top-20 right-0 z-10">
                                                             <LargeIcon />
                                                         </div>
                                                     </div>
@@ -296,7 +293,7 @@ const Navbar = () => {
                                                                     href={sublink.href}
                                                                     className="block p-4 rounded-xl hover:bg-gray-50 transition-all duration-300"
                                                                 >
-                                                                    <span className="text-black font-bold text-xl group-hover:text-red-600 transition-colors duration-300">
+                                                                    <span className="text-black font-medium text-xl group-hover:text-[#FF161F] transition-colors duration-300 font-audiowide">
                                                                         {sublink.name}
                                                                     </span>
                                                                 </a>
@@ -306,10 +303,10 @@ const Navbar = () => {
 
                                                     {/* Explore all services link */}
                                                     {link.exploreLink && (
-                                                        <div className="pt-6 mt-4">
+                                                        <div className=" ml-4">
                                                             <a
                                                                 href={link.exploreLink.href}
-                                                                className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium group"
+                                                                className="inline-flex items-center gap-2 text-[#FF161F] hover:text-[#AD343E] font-medium group"
                                                             >
                                                                 {link.exploreLink.label}
                                                                 <FaArrowRight className="text-sm group-hover:translate-x-2 transition-transform duration-300" />
@@ -324,8 +321,6 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Bottom fade for scroll indication */}
-                    <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-[40px]"></div>
                 </div>
             </nav>
 
@@ -335,7 +330,7 @@ const Navbar = () => {
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between px-6 py-5">
                     <a href="/" className="flex items-center gap-3 group">
-                        <span className="text-2xl font-bold text-red-600 tracking-wide">
+                        <span className="text-2xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
                             RIDEN
                         </span>
                     </a>
@@ -380,20 +375,13 @@ const Navbar = () => {
 
                             {/* Mobile Get App Button */}
                             <div className="mt-8 px-4">
-                                <button className="w-full px-6 py-4 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center justify-center gap-2 text-lg font-medium">
-                                    <FaDownload />
-                                    <span>Get the App</span>
+
+                                <button className="w-full px-6 py-4 bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-xl hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 text-lg font-medium">
+                                    <span> Download App</span>
                                 </button>
                             </div>
 
-                            {/* Mobile Footer Links */}
-                            <div className="mt-8 pt-6 border-t border-gray-200">
-                                <div className="flex justify-center gap-6 text-sm text-gray-500">
-                                    <a href="#" className="hover:text-red-600 transition-colors">Terms</a>
-                                    <a href="#" className="hover:text-red-600 transition-colors">Privacy</a>
-                                    <a href="#" className="hover:text-red-600 transition-colors">Help</a>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
 
@@ -404,7 +392,7 @@ const Navbar = () => {
                             <div className="h-full overflow-y-auto">
                                 <div className="px-6 py-8 relative">
                                     {/* Large Background Icon */}
-                                    <div className="text-[25rem] text-red-600/10 absolute top-10 -right-40 z-0 pointer-events-none">
+                                    <div className="text-[25rem] text-[#FF161F]/10 absolute top-10 -right-40 z-0 pointer-events-none">
                                         {(() => {
                                             const Icon = mobileSubmenu.largeIcon;
                                             return <Icon />;
@@ -416,7 +404,7 @@ const Navbar = () => {
                                         {/* Back Button */}
                                         <button
                                             onClick={closeMobileSubmenu}
-                                            className="relative z-10 flex items-center gap-2 text-gray-600 hover:text-red-600 group"
+                                            className="relative z-10 flex items-center gap-2 text-gray-600 hover:text-[#FF161F] group"
                                         >
                                             <FaChevronLeft className="text-sm group-hover:-translate-x-1 transition-transform duration-300" />
                                         </button>
@@ -436,7 +424,7 @@ const Navbar = () => {
                                                 }}
                                             >
                                                 {/* Text */}
-                                                <span className="relative z-10 block px-6 text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-lg font-medium">
+                                                <span className="relative z-10 block px-6 text-gray-700 group-hover:text-[#FF161F] transition-colors duration-300 text-lg font-medium">
                                                     {sublink.name}
                                                 </span>
                                             </a>
@@ -448,7 +436,7 @@ const Navbar = () => {
                                         <div className="relative z-10 mt-8 pt-6 border-t border-gray-200">
                                             <a
                                                 href={mobileSubmenu.exploreLink.href}
-                                                className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium group"
+                                                className="inline-flex items-center gap-2 text-[#FF161F] hover:text-[#AD343E] font-medium group"
                                                 onClick={() => {
                                                     setIsMobileMenuOpen(false);
                                                     setMobileSubmenu(null);
@@ -464,7 +452,7 @@ const Navbar = () => {
                                         <div className="relative z-10 mt-8 pt-6 border-t border-gray-200">
                                             <a
                                                 href={mobileSubmenu.href}
-                                                className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium group"
+                                                className="inline-flex items-center gap-2 text-[#FF161F] hover:text-[#AD343E] font-medium group"
                                                 onClick={() => {
                                                     setIsMobileMenuOpen(false);
                                                     setMobileSubmenu(null);
