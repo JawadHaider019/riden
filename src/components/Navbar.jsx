@@ -3,7 +3,6 @@ import {
     FaCar,
     FaShieldAlt,
     FaArrowRight,
-    FaDownload,
     FaDollarSign,
     FaUsers,
     FaEnvelope,
