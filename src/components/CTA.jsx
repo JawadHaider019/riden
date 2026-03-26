@@ -33,7 +33,7 @@ const CTA = () => {
                         {/* Right Visual (Download Buttons Column) */}
                         <div className="flex flex-row sm:flex-col gap-2 sm:ml-10 ml-0  z-10">
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-[#FF161F] text-white rounded-2xl hover:opacity-90 transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px]"
                             >
                                 <FaApple className="text-2xl sm:text-3xl" />
@@ -45,7 +45,7 @@ const CTA = () => {
 
 
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-white text-gray-900 rounded-2xl hover:bg-gray-100 transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px]"
                             >
                                 <FaGooglePlay className="text-2xl sm:text-3xl" />

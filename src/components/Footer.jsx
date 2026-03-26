@@ -18,7 +18,7 @@ const Footer = () => {
                         {/* Store Buttons */}
                         <div className="flex flex-row gap-2 pt-4">
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl hover:bg-[#FF161F] hover:text-white transition-all duration-300 group "
                             >
                                 <FaApple className="text-2xl" />
@@ -29,7 +29,7 @@ const Footer = () => {
                             </a>
 
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl hover:bg-[#FF161F] hover:text-white transition-all duration-300 group"
                             >
                                 <FaGooglePlay className="text-2xl" />
@@ -49,7 +49,7 @@ const Footer = () => {
                         <ul className="space-y-3">
                             {['How It Works', 'Vehicle Type', 'Safety', 'Pricing', 'Loyalty Points'].map((link) => (
                                 <li key={link}>
-                                    <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
+                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
                                         {link}
                                     </a>
                                 </li>
@@ -65,7 +65,7 @@ const Footer = () => {
                         <ul className="space-y-3">
                             {['Drive With Fleet', 'Earnings', 'Requirements', 'Driver App', 'Support'].map((link) => (
                                 <li key={link}>
-                                    <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
+                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
                                         {link}
                                     </a>
                                 </li>
@@ -81,7 +81,7 @@ const Footer = () => {
                         <ul className="space-y-3">
                             {['About Us', 'Contact', 'Privacy Policy', 'Terms of Service', 'FAQ'].map((link) => (
                                 <li key={link}>
-                                    <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
+                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-colors duration-300 dm-sans text-sm block">
                                         {link}
                                     </a>
                                 </li>
@@ -99,13 +99,13 @@ const Footer = () => {
                         </p>
 
                         <div className='flex items-center gap-6'>
-                            <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
+                            <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
                                 <FaFacebookF className="text-xl" />
                             </a>
-                            <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
+                            <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
                                 <FaInstagram className="text-xl" />
                             </a>
-                            <a href="#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
+                            <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 hover:scale-110">
                                 <FaTwitter className="text-xl" />
                             </a>
                         </div>

@@ -35,7 +35,7 @@ const Hero = () => {
 
                         <div className="flex flex-row gap-3 sm:gap-4 pt-4 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 bg-[#FF161F] text-white rounded-2xl hover:opacity-90 transition-all duration-300 group shadow-lg min-w-[140px] sm:min-w-[180px]"
                             >
                                 <FaApple className="text-2xl sm:text-3xl" />
@@ -46,7 +46,7 @@ const Hero = () => {
                             </a>
 
                             <a
-                                href="#"
+                                href="/#"
                                 className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 bg-white text-gray-900 rounded-2xl hover:bg-gray-100 transition-all duration-300 group shadow-lg min-w-[140px] sm:min-w-[180px]"
                             >
                                 <FaGooglePlay className="text-2xl sm:text-3xl" />
