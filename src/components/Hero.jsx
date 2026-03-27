@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaApple, FaGooglePlay } from 'react-icons/fa';
-import heroImage from '../assets/hero.png';
+import heroImage from '../assets/hero.jpg';
 
 const Hero = () => {
     return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaRoute, FaUserCheck, FaLock } from 'react-icons/fa6';
+import { FaRoute, FaUserCheck, FaLock, FaPhone } from 'react-icons/fa6';
 
 const SafetyCard = ({ title, description, icon: Icon }) => {
     return (
@@ -21,6 +21,11 @@ const SafetyCard = ({ title, description, icon: Icon }) => {
 
 const Safety = () => {
     const safetyData = [
+        {
+            title: 'In-app communication',
+            description: 'Call your driver through the app. No personal numbers shared — full privacy on both sides.',
+            icon: FaPhone
+        },
         {
             title: 'Live trip sharing',
             description: 'Share your real-time route with a trusted contact they can follow along without needing the app.',
@@ -44,7 +49,7 @@ const Safety = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
 
                     {/* Left Content */}
-                    <div className="space-y-6 sm:space-y-8 lg:sticky lg:top-32">
+                    <div className="space-y-6 sm:space-y-8">
                         <div className="space-y-4">
                             <span className="text-[#FF161F] font-black tracking-widest uppercase text-xs sm:text-sm block">
                                 Safety first
@@ -55,17 +60,16 @@ const Safety = () => {
                             </h2>
                         </div>
 
-                        <p className="text-gray-600 text-base sm:text-lg dm-sans leading-relaxed max-w-xl">
-                            We don't treat safety as a checkbox. It's built into every layer of Fleet from driver verification to your live trip share.
-                        </p>
+                        <p className="text-gray-600 text-base sm:text-lg dm-sans leading-relaxed max-w-md">
+                            We don't treat safety as a checkbox. It's built into every layer of Fleet — from driver verification to your live trip share.             </p>
 
-                        <div className="inline-flex items-center gap-4 text-[#FF161F] font-black audiowide-regular uppercase tracking-wider text-xs sm:text-sm border-b-2 border-[#FF161F]/20 pb-2 hover:border-[#FF161F] transition-all duration-300 cursor-pointer">
+                        <div className="inline-flex items-center gap-4 text-[#FF161F] font-black dm-sans uppercase tracking-wider text-xs sm:text-sm border-b-2 border-[#FF161F]/20 pb-2 hover:border-[#FF161F] transition-all duration-300 cursor-pointer">
                             Learn more about safety
                         </div>
                     </div>
 
                     {/* Right Visual (Feature Cards) */}
-                    <div className="flex flex-col gap-6 sm:gap-8 pt-4 lg:pt-8">
+                    <div className="flex flex-col gap-6 sm:gap-8 ">
                         {safetyData.map((item, index) => (
                             <SafetyCard key={index} {...item} />
                         ))}

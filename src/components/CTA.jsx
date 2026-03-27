@@ -3,9 +3,9 @@ import { FaApple, FaGooglePlay } from 'react-icons/fa';
 
 const CTA = () => {
     return (
-        <section className="bg-white py-16">
+        <section className="bg-white pt-16 pb-6" >
             <div className="max-w-8xl mx-auto px-6 lg:px-16">
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-[2rem] sm:rounded-[3rem] px-8 py-12 s shadow-2xl">
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-[2rem] sm:rounded-[3rem] px-8 py-16 s shadow-2xl">
                     {/* Decorative Background Circles */}
                     <div className="absolute top-10 left-2/3 z-0 w-[400px] h-[400px] bg-[#AD343E] rounded-full pointer-events-none hidden lg:block"></div>
                     <div className="absolute -top-10 left-[70%] w-64 h-64 bg-gradient-to-br from-[#FF161F] to-[#AD343E] opacity-70 rounded-full pointer-events-none hidden lg:block"></div>

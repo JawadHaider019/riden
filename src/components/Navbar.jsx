@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import iconSvg from '../assets/icon.png';
 import {
     FaCar,
     FaShieldAlt,
@@ -37,7 +38,7 @@ const Navbar = () => {
             largeIcon: FaCar,
             hasDropdown: true,
             sublinks: [
-                { name: 'City rides', href: '/city-rides', icon: FaCity },
+                { name: 'Book a Ride', href: '/booking', icon: FaCar },
                 { name: 'City to City', href: '/intercity', icon: FaTruck },
                 { name: 'Delivery', href: '/delivery', icon: FaBox }
             ]
@@ -52,8 +53,7 @@ const Navbar = () => {
                 { name: 'City to City', href: '/intercity-driver', icon: FaTruck },
                 { name: 'Courier delivery', href: '/courier', icon: FaBox },
                 { name: 'Freight delivery', href: '/freight', icon: FaTruck }
-            ],
-            exploreLink: { label: 'Explore all services', href: '/earn-services' }
+            ]
         },
         {
             name: 'Safety',
@@ -140,18 +140,6 @@ const Navbar = () => {
         setActiveDropdown(linkName);
     };
 
-    // Handle mouse leave from nav container
-    const handleNavLeave = (e) => {
-        const relatedTarget = e.relatedTarget;
-        if (relatedTarget?.closest?.('.dropdown-content')) {
-            return;
-        }
-        if (relatedTarget?.closest?.('.dropdown-trigger')) {
-            return;
-        }
-        setActiveDropdown(null);
-    };
-
     // Open mobile submenu
     const openMobileSubmenu = (link) => {
         setMobileSubmenu(link);
@@ -171,6 +159,7 @@ const Navbar = () => {
                     : 'bg-white py-5'
                     } ${isMobileMenuOpen ? 'lg:block hidden' : 'block'
                     }`}
+                onMouseLeave={() => setActiveDropdown(null)}
             >
                 {/* Subtle border line */}
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
@@ -179,7 +168,8 @@ const Navbar = () => {
                     <div className="flex justify-between items-center">
                         {/* Logo */}
                         <a href="/" className="flex items-center gap-3 group">
-                            <span className="text-2xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
+                            <img src={iconSvg} alt="Riden Logo" className="w-10 h-10 md:w-12 md:h-12 hover:scale-105 transition-transform drop-shadow-sm" />
+                            <span className="text-3xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase md:text-3xl">
                                 RIDEN
                             </span>
                         </a>
@@ -187,7 +177,6 @@ const Navbar = () => {
                         {/* Desktop Navigation Links */}
                         <div
                             className="hidden lg:flex items-center space-x-1"
-                            onMouseLeave={handleNavLeave}
                         >
                             {navLinks.map((link) => (
                                 <div
@@ -251,16 +240,15 @@ const Navbar = () => {
                     className="hidden lg:block absolute left-0 w-screen bg-white shadow-2xl overflow-hidden rounded-b-[40px] dropdown-content transition-all duration-500 ease-in-out"
                     style={{
                         top: '100%',
-                        height: isDropdownVisible && contentLoaded ? '70vh' : '0',
+                        height: isDropdownVisible && contentLoaded ? '60vh' : '0',
                         opacity: isDropdownVisible && contentLoaded ? 1 : 0
                     }}
-                    onMouseLeave={() => setActiveDropdown(null)}
                 >
                     {/* Decorative top line - red to black gradient */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-black"></div>
 
-                    {/* Scrollable content area */}
-                    <div className="h-full overflow-y-auto">
+                    {/* Descriptive content area */}
+                    <div className="h-full overflow-hidden">
                         {activeDropdown && navLinks.find(l => l.name === activeDropdown)?.hasDropdown && (
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
                                 {navLinks
@@ -292,7 +280,7 @@ const Navbar = () => {
                                                                     href={sublink.href}
                                                                     className="block p-4 rounded-xl hover:bg-gray-50 transition-all duration-300"
                                                                 >
-                                                                    <span className="text-black font-medium text-xl group-hover:text-[#FF161F] transition-colors duration-300 font-audiowide">
+                                                                    <span className="text-black font-medium text-xl group-hover:text-[#FF161F] transition-colors duration-300 dm-sans">
                                                                         {sublink.name}
                                                                     </span>
                                                                 </a>
