@@ -5,11 +5,7 @@ import {
     HiStar,
     HiShieldCheck,
     HiHeart,
-    HiArrowRight,
-    HiClock,
-    HiCurrencyDollar,
-    HiChatBubbleLeftRight,
-    HiChartBar
+    HiArrowRight
 } from 'react-icons/hi2';
 import AppImg from '../assets/passengerapp.png';
 
