@@ -11,7 +11,6 @@ import {
     FaTimes,
     FaBars,
     FaChevronRight,
-    FaCity,
     FaTruck,
     FaBox,
     FaHandsHelping,

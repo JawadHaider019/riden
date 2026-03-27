@@ -57,25 +57,6 @@ const Features = () => {
         }
     ];
 
-    const driverFeatures = [
-        {
-            title: "Flexible Schedule",
-            icon: <HiClock className="text-xl" />
-        },
-        {
-            title: "Instant Payouts",
-            icon: <HiCurrencyDollar className="text-xl" />
-        },
-        {
-            title: "24/7 Support",
-            icon: <HiChatBubbleLeftRight className="text-xl" />
-        },
-        {
-            title: "Smart Earnings",
-            icon: <HiChartBar className="text-xl" />
-        }
-    ];
-
     return (
         <>
             <section className="py-16 bg-white overflow-hidden">

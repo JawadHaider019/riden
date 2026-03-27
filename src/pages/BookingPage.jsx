@@ -12,15 +12,8 @@ const BookingPage = () => {
     const [step, setStep] = useState('booking'); // booking, for_whom, phone, otp
     const [serviceClass, setServiceClass] = useState('Standard');
     const [isForSomeoneElse, setIsForSomeoneElse] = useState(false);
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-
-    const steps = {
-        booking: 'STEP_BOOKING',
-        for_whom: 'STEP_FOR_WHOM',
-        phone: 'STEP_PHONE',
-        otp: 'STEP_OTP'
-    };
 
     const renderBookingSidebar = () => (
         <div className={`absolute top-0 left-0 h-full w-[360px] lg:w-[400px] bg-white shadow-2xl p-5 sm:p-8 z-20 overflow-y-auto scrollbar-hide flex flex-col transition-transform duration-500 ease-in-out ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
