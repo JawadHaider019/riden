@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import iconSvg from '../assets/icon.png';
 import {
     FaCar,
-    FaShieldAlt,
-    FaArrowRight,
-    FaDollarSign,
     FaUsers,
     FaEnvelope,
     FaChevronLeft,
@@ -13,13 +10,10 @@ import {
     FaChevronRight,
     FaTruck,
     FaBox,
-    FaHandsHelping,
-    FaUserShield,
     FaBuilding,
     FaBriefcase,
     FaRocket,
     FaPhone,
-    FaFileContract,
     FaHome
 } from 'react-icons/fa';
 

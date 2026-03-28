@@ -1,6 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaRoute, FaUserCheck, FaLock, FaPhone } from 'react-icons/fa6';
 
+const safetyData = [
+    {
+        title: 'In-app communication',
+        description: 'Call your driver through the app. No personal numbers shared — full privacy on both sides.',
+        icon: FaPhone
+    },
+    {
+        title: 'Live trip sharing',
+        description: 'Share your real-time route with a trusted contact they can follow along without needing the app.',
+        icon: FaRoute
+    },
+    {
+        title: 'Verified drivers only',
+        description: 'Every Fleet driver passes background checks, license verification, and vehicle inspection before their first ride.',
+        icon: FaUserCheck
+    },
+    {
+        title: 'OTP-secured pickups',
+        description: "A one-time code confirms you're in the right car. No code, no ride simple as that.",
+        icon: FaLock
+    }
+];
+
 const SafetyCard = ({ title, description, icon: Icon, isVisible, delay }) => {
     return (
         <div
@@ -35,29 +58,6 @@ const Safety = () => {
 
     const leftRef = useRef(null);
     const cardsRef = useRef([]);
-
-    const safetyData = [
-        {
-            title: 'In-app communication',
-            description: 'Call your driver through the app. No personal numbers shared — full privacy on both sides.',
-            icon: FaPhone
-        },
-        {
-            title: 'Live trip sharing',
-            description: 'Share your real-time route with a trusted contact they can follow along without needing the app.',
-            icon: FaRoute
-        },
-        {
-            title: 'Verified drivers only',
-            description: 'Every Fleet driver passes background checks, license verification, and vehicle inspection before their first ride.',
-            icon: FaUserCheck
-        },
-        {
-            title: 'OTP-secured pickups',
-            description: "A one-time code confirms you're in the right car. No code, no ride simple as that.",
-            icon: FaLock
-        }
-    ];
 
     useEffect(() => {
         // Observer for left content section

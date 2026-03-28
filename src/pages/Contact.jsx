@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HeroSection from '../components/HeroSection';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaDownload, FaApple, FaGooglePlay } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaApple, FaGooglePlay } from 'react-icons/fa';
 import contactImage from '../assets/contact.jpg';
 
 const Contact = () => {

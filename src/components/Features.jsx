@@ -9,6 +9,49 @@ import {
 } from 'react-icons/hi2';
 import AppImg from '../assets/passengerapp.png';
 
+const features = [
+    {
+        title: "Live driver tracking",
+        description: "Watch your driver's exact location update in real time on the map — from the moment they accept to the second they arrive. ETA updates as they get closer.",
+        category: "Core feature",
+        icon: <HiMapPin className="text-2xl" />,
+        isDark: true,
+        span: "md:col-span-2"
+    },
+    {
+        title: "In-app wallet",
+        description: "Top up once, pay every ride instantly. Full transaction history with real-time balance — no fumbling for cash or cards at the end of a trip.",
+        category: "Payments",
+        icon: <HiWallet className="text-2xl" />,
+        isDark: false,
+        span: "md:col-span-1"
+    },
+    {
+        title: "Loyalty points",
+        description: "Every completed ride earns points. Refer a friend and earn more. Redeem them against future fares the more you ride, the more you save.",
+        category: "Rewards",
+        icon: <HiStar className="text-2xl" />,
+        isDark: false,
+        span: "md:col-span-1"
+    },
+    {
+        title: "OTP-secured pickup",
+        description: "A one-time code confirms you're in the right car with the right driver before every ride begins. Simple, automatic, non-negotiable.",
+        category: "Safety",
+        icon: <HiShieldCheck className="text-2xl" />,
+        isDark: false,
+        span: "md:col-span-1"
+    },
+    {
+        title: "Favourite drivers",
+        description: "Had a great ride? Mark that driver as a favourite and Fleet will prioritise matching you with them automatically next time you book.",
+        category: "Personalisation",
+        icon: <HiHeart className="text-2xl" />,
+        isDark: false,
+        span: "md:col-span-1"
+    }
+];
+
 const Features = () => {
     const [visibleSections, setVisibleSections] = useState({
         header: false,
@@ -21,49 +64,6 @@ const Features = () => {
     const cardsRef = useRef([]);
     const bottomRef = useRef(null);
     const imageRef = useRef(null);
-
-    const features = [
-        {
-            title: "Live driver tracking",
-            description: "Watch your driver's exact location update in real time on the map — from the moment they accept to the second they arrive. ETA updates as they get closer.",
-            category: "Core feature",
-            icon: <HiMapPin className="text-2xl" />,
-            isDark: true,
-            span: "md:col-span-2"
-        },
-        {
-            title: "In-app wallet",
-            description: "Top up once, pay every ride instantly. Full transaction history with real-time balance — no fumbling for cash or cards at the end of a trip.",
-            category: "Payments",
-            icon: <HiWallet className="text-2xl" />,
-            isDark: false,
-            span: "md:col-span-1"
-        },
-        {
-            title: "Loyalty points",
-            description: "Every completed ride earns points. Refer a friend and earn more. Redeem them against future fares the more you ride, the more you save.",
-            category: "Rewards",
-            icon: <HiStar className="text-2xl" />,
-            isDark: false,
-            span: "md:col-span-1"
-        },
-        {
-            title: "OTP-secured pickup",
-            description: "A one-time code confirms you're in the right car with the right driver before every ride begins. Simple, automatic, non-negotiable.",
-            category: "Safety",
-            icon: <HiShieldCheck className="text-2xl" />,
-            isDark: false,
-            span: "md:col-span-1"
-        },
-        {
-            title: "Favourite drivers",
-            description: "Had a great ride? Mark that driver as a favourite and Fleet will prioritise matching you with them automatically next time you book.",
-            category: "Personalisation",
-            icon: <HiHeart className="text-2xl" />,
-            isDark: false,
-            span: "md:col-span-1"
-        }
-    ];
 
     useEffect(() => {
         // Observer for header section

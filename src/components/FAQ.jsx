@@ -39,7 +39,6 @@ const FAQ = () => {
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef(null);
     const leftRef = useRef(null);
-    const faqItemsRef = useRef([]);
 
     const faqData = [
         {
