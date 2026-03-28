@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     HiMapPin,
     HiWallet,
@@ -10,6 +10,18 @@ import {
 import AppImg from '../assets/passengerapp.png';
 
 const Features = () => {
+    const [visibleSections, setVisibleSections] = useState({
+        header: false,
+        cards: [],
+        bottom: false,
+        image: false
+    });
+
+    const headerRef = useRef(null);
+    const cardsRef = useRef([]);
+    const bottomRef = useRef(null);
+    const imageRef = useRef(null);
+
     const features = [
         {
             title: "Live driver tracking",
@@ -53,73 +65,197 @@ const Features = () => {
         }
     ];
 
+    useEffect(() => {
+        // Observer for header section
+        const headerObserver = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisibleSections(prev => ({ ...prev, header: true }));
+                    headerObserver.disconnect();
+                }
+            },
+            { threshold: 0.3 }
+        );
+
+        if (headerRef.current) {
+            headerObserver.observe(headerRef.current);
+        }
+
+        // Observers for each card
+        const cardObservers = features.map((_, index) => {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        setVisibleSections(prev => ({
+                            ...prev,
+                            cards: [...prev.cards, index]
+                        }));
+                        observer.disconnect();
+                    }
+                },
+                { threshold: 0.3 }
+            );
+
+            if (cardsRef.current[index]) {
+                observer.observe(cardsRef.current[index]);
+            }
+            return observer;
+        });
+
+        // Observer for bottom section
+        const bottomObserver = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisibleSections(prev => ({ ...prev, bottom: true }));
+                    bottomObserver.disconnect();
+                }
+            },
+            { threshold: 0.2 }
+        );
+
+        if (bottomRef.current) {
+            bottomObserver.observe(bottomRef.current);
+        }
+
+        // Observer for image section
+        const imageObserver = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisibleSections(prev => ({ ...prev, image: true }));
+                    imageObserver.disconnect();
+                }
+            },
+            { threshold: 0.3 }
+        );
+
+        if (imageRef.current) {
+            imageObserver.observe(imageRef.current);
+        }
+
+        return () => {
+            headerObserver.disconnect();
+            cardObservers.forEach(observer => observer.disconnect());
+            bottomObserver.disconnect();
+            imageObserver.disconnect();
+        };
+    }, []);
+
     return (
-        <>
-            <section className="py-16 bg-white overflow-hidden">
-                <div className="max-w-8xl mx-auto px-6 sm:px-12 lg:px-20">
-                    {/* Header Section */}
-                    <div className="mb-16">
-                        <span className="text-sm font-bold uppercase tracking-widest text-[#FF161F] block mb-4 dm-sans">
-                            App Features
+        <section className="py-16 bg-white overflow-hidden max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
+            <div className="flex flex-col gap-2">
+                {/* Header Section */}
+                <div ref={headerRef} className="mb-16">
+                    <span
+                        className={`text-sm font-bold uppercase tracking-widest text-[#FF161F] block mb-4 dm-sans transition-all duration-700 ${visibleSections.header ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                            }`}
+                    >
+                        App Features
+                    </span>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl audiowide-regular uppercase">
+                        <span
+                            className={`inline-block transition-all duration-700 delay-200 ${visibleSections.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                }`}
+                        >
+                            Built for the ride.
                         </span>
-                        <h2 className="text-4xl md:text-5xl lg:text-6xl audiowide-regular uppercase">
-                            Built for the ride.<br />
+                        <br />
+                        <span
+                            className={`inline-block transition-all duration-700 delay-400 ${visibleSections.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                }`}
+                        >
                             Refined for the rider.
-                        </h2>
-                    </div>
-
-                    {/* Grid Layout */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {features.map((feature, index) => (
-                            <div
-                                key={index}
-                                className={`p-8 rounded-[2rem] flex flex-col justify-between transition-transform duration-300 hover:scale-[1.02] ${feature.span} ${feature.isDark ? 'bg-[#0E0E0E] text-white' : 'bg-[#E5E5E5] text-zinc-900'}`}
-                            >
-                                <div className="space-y-6">
-                                    {/* Icon and Heading row */}
-                                    <div className="flex items-center gap-4">
-                                        <div className={`p-3 rounded-xl ${feature.isDark ? 'bg-zinc-800 text-[#FF161F]' : 'bg-white text-[#FF161F]'}`}>
-                                            {feature.icon}
-                                        </div>
-                                        <h3 className="text-xl md:text-2xl audiowide-regular uppercase">
-                                            {feature.title}
-                                        </h3>
-                                    </div>
-
-                                    <p className={`text-sm md:text-base dm-sans leading-relaxed ${feature.isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                        {feature.description}
-                                    </p>
-                                </div>
-
-                                <div className="mt-2 flex items-center justify-between">
-
-                                    <a
-                                        href="/#"
-                                        className="flex items-center gap-2 text-[#FF161F] text-sm font-bold group"
-                                    >
-                                        {feature.category}
-
-                                        <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-                                    </a>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                        </span>
+                    </h2>
                 </div>
-            </section>
-            <div className="max-w-8xl mx-auto px-6 lg:px-16 ">
+
+                {/* Grid Layout - each card triggers individually */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {features.map((feature, index) => (
+                        <div
+                            key={index}
+                            ref={el => cardsRef.current[index] = el}
+                            className={`p-8 rounded-[2rem] flex flex-col justify-between transition-all duration-500 hover:scale-[1.02] ${feature.span} ${feature.isDark ? 'bg-[#0E0E0E] text-white' : 'bg-[#E5E5E5] text-zinc-900'}`}
+                            style={{
+                                transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+                                opacity: visibleSections.cards.includes(index) ? 1 : 0,
+                                transform: visibleSections.cards.includes(index) ? 'translateY(0)' : 'translateY(30px)',
+                                transitionDelay: visibleSections.cards.includes(index) ? '0s' : '0s'
+                            }}
+                        >
+                            <div className="space-y-6">
+                                {/* Icon and Heading row */}
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-3 rounded-xl transition-all duration-300 group-hover:scale-110 ${feature.isDark ? 'bg-zinc-800 text-[#FF161F]' : 'bg-white text-[#FF161F]'}`}>
+                                        {feature.icon}
+                                    </div>
+                                    <h3 className="text-xl md:text-2xl audiowide-regular uppercase">
+                                        {feature.title}
+                                    </h3>
+                                </div>
+
+                                <p className={`text-sm md:text-base dm-sans leading-relaxed ${feature.isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                    {feature.description}
+                                </p>
+                            </div>
+
+                            <div className="mt-2 flex items-center justify-between">
+                                <a
+                                    href="/#"
+                                    className="flex items-center gap-2 text-[#FF161F] text-sm font-bold group"
+                                >
+                                    {feature.category}
+                                    <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Bottom Section */}
+            <div ref={bottomRef} className="pt-10">
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-12 lg:gap-8">
-
                     {/* Left Content */}
-                    <div className=" w-3/4 ">
+                    <div className="sm:w-3/4 w-full">
                         <div className="flex flex-col gap-8">
-
-                            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black audiowide-regular uppercase text-[#0E0E0E] leading-[1.1]">
-                                Drive with Riden. <br className="lg:hidden" />Earn on your <br className="hidden sm:block" /> own schedule.
-
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl audiowide-regular uppercase">
+                                <span
+                                    className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                        }`}
+                                    style={{ transitionDelay: visibleSections.bottom ? '0s' : '0s' }}
+                                >
+                                    Drive with Riden.
+                                </span>
+                                <br className="md:hidden" />
+                                <span
+                                    className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                        }`}
+                                    style={{ transitionDelay: visibleSections.bottom ? '0.1s' : '0s' }}
+                                >
+                                    Earn on your
+                                </span>
+                                <br className="hidden md:block" />
+                                <span
+                                    className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                        }`}
+                                    style={{ transitionDelay: visibleSections.bottom ? '0.2s' : '0s' }}
+                                >
+                                    own schedule.
+                                </span>
                             </h2>
-                            <p className="text-base sm:text-lg text-zinc-600 dm-sans leading-relaxed">No fixed shifts. No hidden deductions. Just you, your car, and a platform that shows you exactly what you're earning — every single ride.</p>
-                            <a href="/#" className="flex items-center gap-2 bg-gradient-to-br from-[#FF161F] to-[#AD343E] text-white px-4 py-4 rounded-2xl w-fit text-sm font-bold group">
+                            <p
+                                className={`text-base sm:text-lg text-zinc-600 dm-sans leading-relaxed transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                    }`}
+                                style={{ transitionDelay: visibleSections.bottom ? '0.3s' : '0s' }}
+                            >
+                                No fixed shifts. No hidden deductions. Just you, your car, and a platform that shows you exactly what you're earning — every single ride.
+                            </p>
+                            <a
+                                href="/booking"
+                                className={`flex items-center gap-2 bg-gradient-to-br from-[#FF161F] to-[#AD343E] text-white px-4 py-4 rounded-2xl w-fit text-sm font-bold group transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                    } hover:scale-105`}
+                                style={{ transitionDelay: visibleSections.bottom ? '0.4s' : '0s' }}
+                            >
                                 Drive with Riden
                                 <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                             </a>
@@ -127,8 +263,11 @@ const Features = () => {
                     </div>
 
                     {/* Right Visual */}
-                    <div className="  w-1/2 relative group flex justify-center ">
-                        <div className="relative flex justify-center items-center">
+                    <div ref={imageRef} className="sm:w-1/2 w-full relative group flex justify-center">
+                        <div
+                            className={`relative flex justify-center items-center transition-all duration-1000 ${visibleSections.image ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                                }`}
+                        >
                             {/* Centered Decorative Gradient Circle */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] lg:w-[550px] lg:h-[550px] bg-gradient-to-r from-[#FF161F] to-[#AD343E] rounded-full blur-[80px] sm:blur-[120px] opacity-30 pointer-events-none"></div>
 
@@ -139,10 +278,9 @@ const Features = () => {
                             />
                         </div>
                     </div>
-
                 </div>
             </div>
-        </>
+        </section>
     );
 };
 

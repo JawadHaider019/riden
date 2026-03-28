@@ -12,7 +12,7 @@ const BookingPage = () => {
     const [step, setStep] = useState('booking'); // booking, for_whom, phone, otp
     const [serviceClass, setServiceClass] = useState('Standard');
     const [isForSomeoneElse, setIsForSomeoneElse] = useState(false);
-    const [isLogin] = useState(false);
+    const [isLogin] = useState(true);
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
     const renderBookingSidebar = () => (

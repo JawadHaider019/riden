@@ -3,7 +3,7 @@ import HeroSection from '../components/HeroSection';
 import aboutImage from '../assets/about.jpg';
 import Mission from '../components/Mission';
 import Believe from '../components/Believe';
-import Team from '../components/Team';
+// import Team from '../components/Team';
 
 const About = () => {
     return (
@@ -19,7 +19,7 @@ const About = () => {
 
             <Mission />
             <Believe />
-            <Team />
+            {/* <Team /> */}
         </div>
     );
 };
