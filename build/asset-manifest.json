@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.33271851.css",
+    "main.js": "/static/js/main.914b2daa.js",
+    "static/media/hero.png": "/static/media/hero.e01e3eebc5242c0186d3.png",
+    "static/media/contact.jpg": "/static/media/contact.8ad8f174e4cb2c148d48.jpg",
+    "static/media/about.jpg": "/static/media/about.5e0296cbeaa3994fd4d3.jpg",
+    "static/media/passengerapp.png": "/static/media/passengerapp.67c56883f238ee73c1e3.png",
+    "static/media/icon.png": "/static/media/icon.f1461b202547efe9b459.png",
+    "index.html": "/index.html",
+    "main.33271851.css.map": "/static/css/main.33271851.css.map",
+    "main.914b2daa.js.map": "/static/js/main.914b2daa.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.33271851.css",
+    "static/js/main.914b2daa.js"
+  ]
+}
