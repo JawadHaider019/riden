@@ -30,7 +30,7 @@ const Team = () => {
                 {/* Header Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-12 mb-20">
                     <div className="flex-1">
-                        <span className="text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4">
+                        <span className="text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4">
                             The team
                         </span>
                         <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black audiowide-regular uppercase text-gray-900 leading-tight">
@@ -46,8 +46,8 @@ const Team = () => {
                         <div key={member.name} className="flex flex-col items-center text-center group">
                             {/* Circle Image Container */}
                             <div className="relative w-48 h-48 sm:w-56 sm:h-56 mb-8">
-                                <div className="absolute inset-0 bg-[#FF161F]/10 rounded-full scale-105 blur-2xl group-hover:bg-[#FF161F]/20 transition-all duration-500"></div>
-                                <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-gray-100 shadow-xl group-hover:border-[#FF161F]/50 transition-all duration-500">
+                                <div className="absolute inset-0 bg-[#1660C3]/10 rounded-full scale-105 blur-2xl group-hover:bg-[#1660C3]/20 transition-all duration-500"></div>
+                                <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-gray-100 shadow-xl group-hover:border-[#1660C3]/50 transition-all duration-500">
                                     <img
                                         src={member.image}
                                         alt={member.name}
@@ -61,7 +61,7 @@ const Team = () => {
                                 <h3 className="text-2xl font-black audiowide-regular uppercase text-gray-900">
                                     {member.name}
                                 </h3>
-                                <p className="text-[#FF161F] font-bold tracking-widest uppercase text-[10px] sm:text-xs dm-sans">
+                                <p className="text-[#1660C3] font-bold tracking-widest uppercase text-[10px] sm:text-xs dm-sans">
                                     {member.role}
                                 </p>
                             </div>
@@ -75,7 +75,7 @@ const Team = () => {
                         href="/contact"
                         className="relative overflow-hidden group inline-block"
                     >
-                        <div className="relative px-8 py-3 font-bold uppercase tracking-wider bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-xl hover:shadow-red-500/20 active:scale-95">
+                        <div className="relative px-8 py-3 font-bold uppercase tracking-wider bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-xl hover:shadow-blue-500/20 active:scale-95">
                             Get In touch
                         </div>
                     </a>

@@ -6,6 +6,9 @@ import About from './pages/About';
 import BookingPage from './pages/BookingPage';
 
 
+import ProfilePage from './pages/ProfilePage';
+
+
 function App() {
   return (
     <div className="App">
@@ -14,6 +17,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </div>
   );

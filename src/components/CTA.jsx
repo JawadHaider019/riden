@@ -26,10 +26,10 @@ const CTA = () => {
     return (
         <section ref={sectionRef} className="bg-white pt-16 pb-6 overflow-hidden">
             <div className="max-w-8xl mx-auto px-6 lg:px-16">
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-[2rem] sm:rounded-[3rem] px-8 py-16 shadow-xl">
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#1660C3] to-[#2671D8] rounded-[2rem] sm:rounded-[3rem] px-8 py-16 shadow-xl">
                     {/* Decorative Background Circles */}
-                    <div className="absolute top-10 left-2/3 z-0 w-[400px] h-[400px] bg-[#AD343E] rounded-full pointer-events-none hidden lg:block"></div>
-                    <div className="absolute -top-10 left-[70%] w-64 h-64 bg-gradient-to-br from-[#FF161F] to-[#AD343E] opacity-70 rounded-full pointer-events-none hidden lg:block"></div>
+                    <div className="absolute top-10 left-2/3 z-0 w-[400px] h-[400px] bg-[#2671D8] rounded-full pointer-events-none hidden lg:block"></div>
+                    <div className="absolute -top-10 left-[70%] w-64 h-64 bg-gradient-to-br from-[#1660C3] to-[#2671D8] opacity-70 rounded-full pointer-events-none hidden lg:block"></div>
 
                     <div className="relative z-10 flex flex-col lg:flex-row gap-12 sm:gap-32 items-center lg:items-end">
                         {/* Left Content */}
@@ -72,7 +72,7 @@ const CTA = () => {
                             {/* Apple Store Button */}
                             <a
                                 href="/#"
-                                className={`flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-[#FF161F] text-white rounded-2xl transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'
+                                className={`flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-[#1660C3] text-white rounded-2xl transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'
                                     }`}
                                 style={{
                                     transitionDelay: isVisible ? '800ms' : '0s',

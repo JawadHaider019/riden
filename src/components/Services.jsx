@@ -3,12 +3,12 @@ import { FaCarSide, FaTruck, FaUsers, FaMapLocationDot } from 'react-icons/fa6';
 
 const ServiceCard = ({ title, description, links, icon: Icon, isComingSoon }) => {
     return (
-        <div className={`relative group py-8 px-6 rounded-[1.5rem]  transition-all duration-500 overflow-hidden ${isComingSoon ? 'bg-[#E5E5E5]' : 'bg-[#E5E5E5] hover:shadow-2xl hover:shadow-red-900/10 hover:-translate-y-1'
+        <div className={`relative group py-8 px-6 rounded-[1.5rem]  transition-all duration-500 overflow-hidden ${isComingSoon ? 'bg-[#E5E5E5]' : 'bg-[#E5E5E5] hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-1'
             }`}>
             {/* Grayscale Overlay for Coming Soon */}
             {isComingSoon && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-100/40 backdrop-blur-[2px]">
-                    <span className="px-4 py-2 text-[#FF161F] text-2xl sm:text-3xl font-black audiowide-regular uppercase tracking-tighter">
+                    <span className="px-4 py-2 text-[#1660C3] text-2xl sm:text-3xl font-black audiowide-regular uppercase tracking-tighter">
                         Coming Soon
                     </span>
                 </div>
@@ -17,10 +17,10 @@ const ServiceCard = ({ title, description, links, icon: Icon, isComingSoon }) =>
             <div className={`space-y-6 sm:space-y-8 ${isComingSoon ? 'grayscale opacity-90' : ''}`}>
                 <div className="space-y-4">
                     <div className='flex items-start justify-between gap-4'>
-                        <h3 className="text-2xl sm:text-3xl audiowide-regular uppercase text-[#FF161F] leading-tight">
+                        <h3 className="text-2xl sm:text-3xl audiowide-regular uppercase text-[#1660C3] leading-tight">
                             {title}
                         </h3>
-                        <div className='text-3xl bg-gradient-to-b from-[#FF161F] to-[#AD343E] p-3 rounded-2xl text-white shadow-lg shadow-red-200/50 flex-shrink-0'>
+                        <div className='text-3xl bg-gradient-to-b from-[#1660C3] to-[#2671D8] p-3 rounded-2xl text-white shadow-lg shadow-blue-200/50 flex-shrink-0'>
                             <Icon />
                         </div>
                     </div>
@@ -33,7 +33,7 @@ const ServiceCard = ({ title, description, links, icon: Icon, isComingSoon }) =>
                     {links.map((link, index) => (
                         <div
                             key={index}
-                            className="flex items-center uppercase justify-between text-[#FF161F] font-bold text-xs sm:text-sm"
+                            className="flex items-center uppercase justify-between text-[#1660C3] font-bold text-xs sm:text-sm"
                         >
                             <span className="audiowide-regular tracking-wide">{link}</span>
                         </div>
@@ -81,7 +81,7 @@ const Services = () => {
             <div className="max-w-8xl mx-auto px-6 lg:px-24">
                 {/* Heading Section */}
                 <div className="text-center mb-16 sm:mb-24">
-                    <span className="text-[#FF161F] font-black tracking-widest uppercase text-xs sm:text-sm block mb-4">
+                    <span className="text-[#1660C3] font-black tracking-widest uppercase text-xs sm:text-sm block mb-4">
                         Our Offerings
                     </span>
                     <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black audiowide-regular uppercase text-[#0E0E0E] leading-tight">

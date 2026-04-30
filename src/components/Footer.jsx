@@ -63,7 +63,7 @@ const Footer = () => {
                         <div className="flex flex-row gap-2 pt-4">
                             <a
                                 href="/#"
-                                className={`flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl transition-all duration-500 group hover:bg-[#FF161F] hover:text-white ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'
+                                className={`flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl transition-all duration-500 group hover:bg-[#1660C3] hover:text-white ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'
                                     }`}
                                 style={{ transitionDelay: isVisible ? '0.3s' : '0s' }}
                                 onMouseEnter={(e) => {
@@ -82,7 +82,7 @@ const Footer = () => {
 
                             <a
                                 href="/#"
-                                className={`flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl transition-all duration-500 group hover:bg-[#FF161F] hover:text-white ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'
+                                className={`flex items-center w-[180px] gap-3 px-2 py-2.5 bg-gray-100 text-black rounded-xl transition-all duration-500 group hover:bg-[#1660C3] hover:text-white ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'
                                     }`}
                                 style={{ transitionDelay: isVisible ? '0.4s' : '0s' }}
                                 onMouseEnter={(e) => {
@@ -121,7 +121,7 @@ const Footer = () => {
                                         transitionDelay: isVisible ? `${0.6 + (index * 0.05)}s` : '0s'
                                     }}
                                 >
-                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
+                                    <a href="/#" className="text-gray-400 hover:text-[#1660C3] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
                                         {link}
                                     </a>
                                 </li>
@@ -149,7 +149,7 @@ const Footer = () => {
                                         transitionDelay: isVisible ? `${0.8 + (index * 0.05)}s` : '0s'
                                     }}
                                 >
-                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
+                                    <a href="/#" className="text-gray-400 hover:text-[#1660C3] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
                                         {link}
                                     </a>
                                 </li>
@@ -177,7 +177,7 @@ const Footer = () => {
                                         transitionDelay: isVisible ? `${1.0 + (index * 0.05)}s` : '0s'
                                     }}
                                 >
-                                    <a href="/#" className="text-gray-400 hover:text-[#FF161F] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
+                                    <a href="/#" className="text-gray-400 hover:text-[#1660C3] transition-all duration-300 dm-sans text-sm block hover:translate-x-2">
                                         {link}
                                     </a>
                                 </li>
@@ -206,7 +206,7 @@ const Footer = () => {
                                 <a
                                     key={social.label}
                                     href="/#"
-                                    className={`text-gray-400 transition-all duration-300 hover:text-[#FF161F] hover:scale-110 hover:translateY(-3px) ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                                    className={`text-gray-400 transition-all duration-300 hover:text-[#1660C3] hover:scale-110 hover:translateY(-3px) ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                                         }`}
                                     style={{
                                         transition: 'all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)',

@@ -16,10 +16,10 @@ const FAQItem = ({ question, answer, isOpen, onClick, isVisible, delay }) => {
                 className="w-full flex items-center justify-between text-left group transition-all duration-300"
                 onClick={onClick}
             >
-                <h3 className={`text-lg md:text-xl audiowide-regular uppercase transition-all duration-300 ${isOpen ? 'text-[#FF161F]' : 'text-[#0E0E0E] group-hover:text-[#FF161F]'}`}>
+                <h3 className={`text-lg md:text-xl audiowide-regular uppercase transition-all duration-300 ${isOpen ? 'text-[#1660C3]' : 'text-[#0E0E0E] group-hover:text-[#1660C3]'}`}>
                     {question}
                 </h3>
-                <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? 'bg-[#FF161F] text-white rotate-180' : 'bg-zinc-100 text-[#0E0E0E] group-hover:bg-[#FF161F]/10'}`}>
+                <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? 'bg-[#1660C3] text-white rotate-180' : 'bg-zinc-100 text-[#0E0E0E] group-hover:bg-[#1660C3]/10'}`}>
                     {isOpen ? <HiMinus /> : <HiPlus />}
                 </div>
             </button>
@@ -86,7 +86,7 @@ const FAQ = () => {
                     <div ref={leftRef} className="space-y-8">
                         <div className="space-y-4">
                             <span
-                                className={`text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block dm-sans transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                                className={`text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block dm-sans transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                     }`}
                             >
                                 FAQ

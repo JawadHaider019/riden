@@ -8,6 +8,8 @@ import {
     HiArrowRight
 } from 'react-icons/hi2';
 import AppImg from '../assets/passengerapp.png';
+import App1 from '../assets/app1.png';
+import App2 from '../assets/app2.png';
 
 const features = [
     {
@@ -16,7 +18,7 @@ const features = [
         category: "Core feature",
         icon: <HiMapPin className="text-2xl" />,
         isDark: true,
-        span: "md:col-span-2"
+        span: "md:col-span-2 lg:col-span-2"
     },
     {
         title: "In-app wallet",
@@ -141,12 +143,12 @@ const Features = () => {
     }, []);
 
     return (
-        <section className="py-16 bg-white overflow-hidden max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
+        <section className="pt-16 pb-32 sm:pb-16 bg-white overflow-hidden max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
             <div className="flex flex-col gap-2">
                 {/* Header Section */}
                 <div ref={headerRef} className="mb-16">
                     <span
-                        className={`text-sm font-bold uppercase tracking-widest text-[#FF161F] block mb-4 dm-sans transition-all duration-700 ${visibleSections.header ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                        className={`text-sm font-bold uppercase tracking-widest text-[#1660C3] block mb-4 dm-sans transition-all duration-700 ${visibleSections.header ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                             }`}
                     >
                         App Features
@@ -169,12 +171,12 @@ const Features = () => {
                 </div>
 
                 {/* Grid Layout - each card triggers individually */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {features.map((feature, index) => (
                         <div
                             key={index}
                             ref={el => cardsRef.current[index] = el}
-                            className={`p-8 rounded-[2rem] flex flex-col justify-between transition-all duration-500 hover:scale-[1.02] ${feature.span} ${feature.isDark ? 'bg-[#0E0E0E] text-white' : 'bg-[#E5E5E5] text-zinc-900'}`}
+                            className={`p-8 rounded-[2rem] flex flex-col justify-between transition-all duration-500 hover:scale-[1.02] ${feature.span} ${feature.isDark ? 'bg-[#ACC7F7]/60 text-black' : 'bg-[#E5E5E5] text-black'}`}
                             style={{
                                 transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
                                 opacity: visibleSections.cards.includes(index) ? 1 : 0,
@@ -185,7 +187,7 @@ const Features = () => {
                             <div className="space-y-6">
                                 {/* Icon and Heading row */}
                                 <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl transition-all duration-300 group-hover:scale-110 ${feature.isDark ? 'bg-zinc-800 text-[#FF161F]' : 'bg-white text-[#FF161F]'}`}>
+                                    <div className={`p-3 rounded-xl transition-all duration-300 group-hover:scale-110 ${feature.isDark ? 'bg-[#1660C3] text-white' : 'bg-white text-[#1660C3]'}`}>
                                         {feature.icon}
                                     </div>
                                     <h3 className="text-xl md:text-2xl audiowide-regular uppercase">
@@ -193,7 +195,7 @@ const Features = () => {
                                     </h3>
                                 </div>
 
-                                <p className={`text-sm md:text-base dm-sans leading-relaxed ${feature.isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                <p className={`text-sm md:text-base dm-sans leading-relaxed ${feature.isDark ? 'text-zinc-900' : 'text-zinc-600'}`}>
                                     {feature.description}
                                 </p>
                             </div>
@@ -201,7 +203,7 @@ const Features = () => {
                             <div className="mt-2 flex items-center justify-between">
                                 <a
                                     href="/#"
-                                    className="flex items-center gap-2 text-[#FF161F] text-sm font-bold group"
+                                    className="flex items-center gap-2 text-[#1660C3] text-sm font-bold group"
                                 >
                                     {feature.category}
                                     <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -212,70 +214,90 @@ const Features = () => {
                 </div>
             </div>
 
-            {/* Bottom Section */}
-            <div ref={bottomRef} className="pt-10">
-                <div className="flex flex-col lg:flex-row justify-between items-center gap-12 lg:gap-8">
+            {/* Bottom Section - Drive with Riden */}
+            <div ref={bottomRef} className="py-8">
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
                     {/* Left Content */}
-                    <div className="sm:w-3/4 w-full">
-                        <div className="flex flex-col gap-8">
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl audiowide-regular uppercase">
+                    <div className="lg:w-[60%] w-full">
+                        <div className="flex flex-col gap-6">
+                            <h2 className="text-3xl sm:text-5xl lg:text-[60px] audiowide-regular uppercase leading-[1.1] tracking-tight">
                                 <span
                                     className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                         }`}
-                                    style={{ transitionDelay: visibleSections.bottom ? '0s' : '0s' }}
                                 >
                                     Drive with Riden.
                                 </span>
-                                <br className="md:hidden" />
+                                <br />
                                 <span
                                     className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                         }`}
-                                    style={{ transitionDelay: visibleSections.bottom ? '0.1s' : '0s' }}
+                                    style={{ transitionDelay: '0.1s' }}
                                 >
                                     Earn on your
                                 </span>
-                                <br className="hidden md:block" />
+                                <br />
                                 <span
                                     className={`inline-block transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                         }`}
-                                    style={{ transitionDelay: visibleSections.bottom ? '0.2s' : '0s' }}
+                                    style={{ transitionDelay: '0.2s' }}
                                 >
                                     own schedule.
                                 </span>
                             </h2>
                             <p
-                                className={`text-base sm:text-lg text-zinc-600 dm-sans leading-relaxed transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                className={`text-base sm:text-lg text-zinc-500 max-w-xl dm-sans leading-relaxed transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                     }`}
-                                style={{ transitionDelay: visibleSections.bottom ? '0.3s' : '0s' }}
+                                style={{ transitionDelay: '0.3s' }}
                             >
                                 No fixed shifts. No hidden deductions. Just you, your car, and a platform that shows you exactly what you're earning — every single ride.
                             </p>
                             <a
                                 href="/booking"
-                                className={`flex items-center gap-2 bg-gradient-to-br from-[#FF161F] to-[#AD343E] text-white px-4 py-4 rounded-2xl w-fit text-sm font-bold group transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                                    } hover:scale-105`}
-                                style={{ transitionDelay: visibleSections.bottom ? '0.4s' : '0s' }}
+                                className={`flex items-center justify-center bg-[#1660C3] text-white px-8 py-4 rounded-xl w-full sm:w-fit text-sm font-bold uppercase transition-all duration-700 ${visibleSections.bottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                    } hover:bg-[#1660C3]/90 hover:scale-105 shadow-xl`}
+                                style={{ transitionDelay: '0.4s' }}
                             >
-                                Drive with Riden
-                                <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                                Drive with us
                             </a>
                         </div>
                     </div>
 
-                    {/* Right Visual */}
-                    <div ref={imageRef} className="sm:w-1/2 w-full relative group flex justify-center">
+                    {/* Right Visual - Overlapping Phones */}
+                    <div ref={imageRef} className="lg:w-[40%] w-full relative flex justify-center items-center h-[400px] sm:h-[500px] lg:h-[600px] mt-0 lg:mt-0">
                         <div
                             className={`relative flex justify-center items-center transition-all duration-1000 ${visibleSections.image ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
                                 }`}
                         >
-                            {/* Centered Decorative Gradient Circle */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] lg:w-[550px] lg:h-[550px] bg-gradient-to-r from-[#FF161F] to-[#AD343E] rounded-full blur-[80px] sm:blur-[120px] opacity-30 pointer-events-none"></div>
+                            {/* Decorative Background Glow */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] lg:w-[600px] lg:h-[600px] bg-[#1660C3]/30 rounded-full blur-[80px] lg:blur-[100px] opacity-60 pointer-events-none"></div>
 
-                            <img
-                                src={AppImg}
-                                alt="App Interface"
-                                className="relative z-10 w-auto h-[400px] sm:h-[500px] lg:h-[600px] object-contain"
-                            />
+                            {/* Back Phone (App2) */}
+                            <div
+                                className={`relative z-10 transition-all duration-1000 delay-300 ${visibleSections.image
+                                    ? 'rotate-[-10deg] lg:rotate-[-15deg] -translate-x-12 sm:-translate-x-20'
+                                    : 'rotate-0 translate-x-0'
+                                    } h-[350px] sm:h-[450px] lg:h-[550px]`}
+                            >
+                                <img
+                                    src={App2}
+                                    alt="Driver App Screen 1"
+                                    className="w-full object-cover h-[650px] drop-shadow-2xl"
+                                />
+                            </div>
+
+                            {/* Front Phone (App1) */}
+                            <div
+                                className={`absolute z-20 transition-all duration-1000 delay-500 ${visibleSections.image
+                                    ? 'rotate-[10deg] lg:rotate-[15deg] translate-x-8 sm:translate-x-20'
+                                    : 'rotate-0 translate-x-0'
+                                    } -translate-y-2 lg:-translate-y-4 h-[350px] sm:h-[450px] lg:h-[550px]`}
+                            >
+                                <img
+                                    src={App1}
+                                    alt="Driver App Screen 2"
+                                    className="w-full object-cover h-[650px] drop-shadow-2xl"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

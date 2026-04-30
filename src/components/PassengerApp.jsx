@@ -30,7 +30,7 @@ const PassengerApp = () => {
                     {/* Left Content */}
                     <div className=" flex-1 w-full">
                         <div className="space-y-4 mb-10 sm:mb-12">
-                            <span className="text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block">
+                            <span className="text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block">
                                 Passenger app
                             </span>
                             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black audiowide-regular uppercase text-[#0E0E0E] leading-[1.1]">
@@ -44,7 +44,7 @@ const PassengerApp = () => {
                                 const Icon = feature.icon;
                                 return (
                                     <div key={index} className="flex items-center gap-4 group">
-                                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-b from-[#FF161F] to-[#AD343E] text-white rounded-xl flex items-center justify-center shadow-md">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-b from-[#1660C3] to-[#2671D8] text-white rounded-xl flex items-center justify-center shadow-md">
                                             <Icon className="text-xl" />
                                         </div>
                                         <div>
@@ -62,7 +62,7 @@ const PassengerApp = () => {
                     <div className="relative group flex-1 flex justify-center lg:justify-end w-full">
                         <div className="relative flex justify-center items-center">
                             {/* Centered Decorative Gradient Circle */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[450px] sm:h-[450px] lg:w-[650px] lg:h-[650px] bg-gradient-to-r from-[#FF161F] to-[#AD343E] rounded-full blur-[80px] sm:blur-[120px] opacity-30 pointer-events-none"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[450px] sm:h-[450px] lg:w-[650px] lg:h-[650px] bg-gradient-to-r from-[#1660C3] to-[#2671D8] rounded-full blur-[80px] sm:blur-[120px] opacity-30 pointer-events-none"></div>
 
                             <img
                                 src={passengerAppImg}

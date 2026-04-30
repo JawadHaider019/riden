@@ -35,7 +35,7 @@ const SafetyCard = ({ title, description, icon: Icon, isVisible, delay }) => {
                 transitionDelay: `${delay}s`
             }}
         >
-            <div className="text-xl bg-gradient-to-b from-[#FF161F] to-[#AD343E] p-4 sm:p-5 rounded-2xl text-white shadow-lg shadow-red-200/50 flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+            <div className="text-xl bg-gradient-to-b from-[#1660C3] to-[#2671D8] p-4 sm:p-5 rounded-2xl text-white shadow-lg shadow-blue-200/50 flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
                 <Icon />
             </div>
             <div>
@@ -103,14 +103,17 @@ const Safety = () => {
     }, []);
 
     return (
-        <section className="bg-[#E5E5E5] py-16 overflow-hidden">
+        <section className="relative bg-white py-16 overflow-hidden">
+            {/* Decorative Background Glow */}
+            <div className="absolute top-0 right-0  w-[400px] h-[400px] lg:w-[800px] lg:h-[800px] bg-[#1660C3]/30 rounded-full blur-[80px] lg:blur-[100px] opacity-60 pointer-events-none"></div>
             <div className="max-w-8xl mx-auto px-6 lg:px-16">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+
                     {/* Left Content */}
                     <div ref={leftRef} className="space-y-6 sm:space-y-8">
                         <div className="space-y-4">
                             <span
-                                className={`text-[#FF161F] font-black tracking-widest uppercase text-xs sm:text-sm block transition-all duration-700 ${visibleSections.leftContent ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                                className={`text-[#1660C3] font-black tracking-widest uppercase text-xs sm:text-sm block transition-all duration-700 ${visibleSections.leftContent ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                     }`}
                             >
                                 Safety first
@@ -139,14 +142,14 @@ const Safety = () => {
                             We don't treat safety as a checkbox. It's built into every layer of Fleet — from driver verification to your live trip share.
                         </p>
 
-                        <a
+                        {/* <a
                             href="/about"
-                            className={`inline-flex items-center gap-4 text-[#FF161F] font-black dm-sans uppercase tracking-wider text-xs sm:text-sm border-b-2 border-[#FF161F]/20 pb-2 hover:border-[#FF161F] transition-all duration-300 cursor-pointer ${visibleSections.leftContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                            className={`inline-flex items-center gap-4 text-[#1660C3] font-black dm-sans uppercase tracking-wider text-xs sm:text-sm border-b-2 border-[#1660C3]/20 pb-2 hover:border-[#1660C3] transition-all duration-300 cursor-pointer ${visibleSections.leftContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                 }`}
                             style={{ transitionDelay: visibleSections.leftContent ? '0.8s' : '0s' }}
                         >
                             Learn more about safety
-                        </a>
+                        </a> */}
                     </div>
 
                     {/* Right Visual (Feature Cards) */}

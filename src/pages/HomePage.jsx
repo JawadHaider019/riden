@@ -6,6 +6,8 @@ import Safety from '../components/Safety';
 import FAQ from '../components/FAQ';
 import CTA from '../components/CTA';
 
+
+
 function Home() {
     return (
         <>

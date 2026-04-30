@@ -29,7 +29,7 @@ const Mission = () => {
                     {/* Left Side */}
                     <div className="flex-1">
                         <p
-                            className={`text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block dm-sans mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                            className={`text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block dm-sans mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                 }`}
                         >
                             Our Mission

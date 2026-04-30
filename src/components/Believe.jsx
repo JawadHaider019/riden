@@ -41,18 +41,18 @@ const Believe = () => {
     }, []);
 
     return (
-        <section ref={sectionRef} className="bg-[#AD343E] py-16 overflow-hidden">
+        <section ref={sectionRef} className="bg-[#ACC7F7]/60 py-16 overflow-hidden">
             <div className="max-w-8xl mx-auto px-6 lg:px-16">
                 {/* Header Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-12 mb-12 sm:mb-20">
                     <div className="flex-1">
                         <span
-                            className={`text-white/95 font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                            className={`text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                 }`}
                         >
                             What we believe
                         </span>
-                        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black audiowide-regular uppercase text-white leading-tight">
+                        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black audiowide-regular uppercase text-black leading-tight">
                             <span
                                 className={`inline-block transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                     }`}
@@ -86,13 +86,13 @@ const Believe = () => {
                             >
                                 <div className="relative z-10 flex flex-col gap-6 px-8 py-10 sm:py-16 bg-white h-full transition-all duration-500 group-hover:bg-gray-50">
                                     {/* Number Highlight */}
-                                    <span className="text-7xl font-black text-black/30 dm-sans leading-none transition-all duration-500 group-hover:text-[#AD343E]/30 group-hover:scale-110 group-hover:translate-x-2">
+                                    <span className="text-7xl font-black text-black/30 dm-sans leading-none transition-all duration-500 group-hover:text-[#2671D8]/30 group-hover:scale-110 group-hover:translate-x-2">
                                         {belief.id}
                                     </span>
 
                                     {/* Content */}
                                     <div className="space-y-4">
-                                        <h3 className="text-xl sm:text-2xl text-[#0E0E0E] audiowide-regular uppercase leading-tight transition-all duration-500 group-hover:text-[#AD343E] group-hover:translate-x-2">
+                                        <h3 className="text-xl sm:text-2xl text-[#0E0E0E] audiowide-regular uppercase leading-tight transition-all duration-500 group-hover:text-[#2671D8] group-hover:translate-x-2">
                                             {belief.title}
                                         </h3>
                                         <p className="text-gray-600 text-base sm:text-lg dm-sans leading-relaxed transition-all duration-500 group-hover:text-gray-800">

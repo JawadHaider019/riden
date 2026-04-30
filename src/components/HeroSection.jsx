@@ -41,10 +41,10 @@ const HeroSection = ({
                 <div className="max-w-5xl px-4 sm:px-8 lg:px-16 space-y-6 lg:space-y-8">
                     {/* Small Heading / Tagline */}
                     <div
-                        className={`inline-block px-4 py-1 border border-[#FF4D4D] rounded-full bg-white/5 backdrop-blur-sm transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
+                        className={`inline-block px-4 py-1 border border-[#1660C3] rounded-full bg-white/5 backdrop-blur-sm transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
                             }`}
                     >
-                        <span className="text-[#FF4D4D] font-black tracking-[0.3em] uppercase text-xs sm:text-sm block">
+                        <span className="text-[#1660C3] font-black tracking-[0.3em] uppercase text-xs sm:text-sm block">
                             {smallHeading}
                         </span>
                     </div>

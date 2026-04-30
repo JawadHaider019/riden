@@ -63,7 +63,7 @@ const Contact = () => {
                         <div ref={contactInfoRef} className="space-y-8">
                             <div className="space-y-4">
                                 <p
-                                    className={`text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-2 dm-sans transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                                    className={`text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-2 dm-sans transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                         }`}
                                 >
                                     Find us
@@ -92,11 +92,11 @@ const Contact = () => {
                                         }`}
                                     style={{ transitionDelay: isVisible ? '0.5s' : '0s' }}
                                 >
-                                    <div className="w-14 h-14 bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#FF161F]/40 group-hover:scale-110 transition-all duration-500">
+                                    <div className="w-14 h-14 bg-gradient-to-br from-[#1660C3] to-[#2671D8] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#1660C3]/40 group-hover:scale-110 transition-all duration-500">
                                         <FaEnvelope size={24} />
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#FF161F] transition-colors duration-300">Email us</p>
+                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#1660C3] transition-colors duration-300">Email us</p>
                                         <p className="text-gray-600 dm-sans break-all">hello@ridenapp.co</p>
                                         <p className="text-gray-600 dm-sans break-all">support@ridenapp.co</p>
                                     </div>
@@ -108,11 +108,11 @@ const Contact = () => {
                                         }`}
                                     style={{ transitionDelay: isVisible ? '0.6s' : '0s' }}
                                 >
-                                    <div className="w-14 h-14 bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#FF161F]/40 group-hover:scale-110 transition-all duration-500">
+                                    <div className="w-14 h-14 bg-gradient-to-br from-[#1660C3] to-[#2671D8] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#1660C3]/40 group-hover:scale-110 transition-all duration-500">
                                         <FaPhone size={24} />
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#FF161F] transition-colors duration-300">Call or WhatsApp</p>
+                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#1660C3] transition-colors duration-300">Call or WhatsApp</p>
                                         <p className="text-gray-600 dm-sans font-bold">+1 (800) FLEET-00</p>
                                         <p className="text-gray-500 text-sm dm-sans italic">Available 8am – 10pm daily</p>
                                     </div>
@@ -124,11 +124,11 @@ const Contact = () => {
                                         }`}
                                     style={{ transitionDelay: isVisible ? '0.7s' : '0s' }}
                                 >
-                                    <div className="w-14 h-14 bg-gradient-to-br from-[#FF161F] to-[#AD343E] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#FF161F]/40 group-hover:scale-110 transition-all duration-500">
+                                    <div className="w-14 h-14 bg-gradient-to-br from-[#1660C3] to-[#2671D8] rounded-2xl flex items-center justify-center text-white shrink-0 border border-transparent shadow-lg group-hover:shadow-[#1660C3]/40 group-hover:scale-110 transition-all duration-500">
                                         <FaMapMarkerAlt size={24} />
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#FF161F] transition-colors duration-300">Head office</p>
+                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#1660C3] transition-colors duration-300">Head office</p>
                                         <p className="text-gray-600 dm-sans">Riden technologies Ltd.</p>
                                         <p className="text-gray-600 dm-sans">Innovation Tower Tech District</p>
                                     </div>
@@ -141,11 +141,11 @@ const Contact = () => {
                                     style={{ transitionDelay: isVisible ? '0.8s' : '0s' }}
                                 >
                                     <div className="space-y-1">
-                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#FF161F] transition-colors duration-300">Download the app</p>
+                                        <p className="text-gray-900 font-bold audiowide-regular uppercase text-xl group-hover:text-[#1660C3] transition-colors duration-300">Download the app</p>
                                         <div className="flex gap-2 z-10">
                                             <a
                                                 href="/#"
-                                                className="flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-[#FF161F] text-white rounded-2xl hover:opacity-90 hover:scale-105 transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px]"
+                                                className="flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-6 py-2.5 sm:py-3 bg-[#1660C3] text-white rounded-2xl hover:opacity-90 hover:scale-105 transition-all duration-300 group shadow-lg min-w-[130px] sm:min-w-[180px]"
                                             >
                                                 <FaApple className="text-2xl sm:text-3xl group-hover:animate-bounce-slow" />
                                                 <div className="flex flex-col items-start leading-tight">
@@ -178,7 +178,7 @@ const Contact = () => {
                         >
                             <div className="relative z-10 space-y-8">
                                 <div className="space-y-2">
-                                    <h3 className="dm-sans text-[#FF161F] text-xs sm:text-sm font-bold tracking-widest uppercase">
+                                    <h3 className="dm-sans text-[#1660C3] text-xs sm:text-sm font-bold tracking-widest uppercase">
                                         Send a Message
                                     </h3>
                                     <p className="text-2xl xs:text-3xl uppercase audiowide-regular leading-tight">We'll get back to you within 24 hours.</p>
@@ -187,60 +187,60 @@ const Contact = () => {
                                 <form className="space-y-5">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">First Name</label>
+                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">First Name</label>
                                             <input
                                                 type="text"
                                                 placeholder="Sara"
-                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
+                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">Last Name</label>
+                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">Last Name</label>
                                             <input
                                                 type="text"
                                                 placeholder="Mitchell"
-                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
+                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">Email Address</label>
+                                        <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">Email Address</label>
                                         <input
                                             type="email"
                                             placeholder="yourgmail@gmail.com"
-                                            className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
+                                            className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">I am a...</label>
-                                            <select className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans appearance-none shadow-sm cursor-pointer focus:scale-105">
+                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">I am a...</label>
+                                            <select className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans appearance-none shadow-sm cursor-pointer focus:scale-105">
                                                 <option>Driver</option>
                                                 <option>Passenger</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">Subject</label>
+                                            <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">Subject</label>
                                             <input
                                                 type="text"
                                                 placeholder="How can we help?"
-                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
+                                                className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans shadow-sm focus:scale-105"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FF161F] dm-sans">Message</label>
+                                        <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1660C3] dm-sans">Message</label>
                                         <textarea
                                             rows="4"
                                             placeholder="Tell Us what is in your mind"
-                                            className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#FF161F] text-black transition-all duration-300 dm-sans resize-none shadow-sm focus:scale-105"
+                                            className="w-full px-5 py-3.5 bg-white border border-transparent rounded-xl focus:outline-none focus:border-[#1660C3] text-black transition-all duration-300 dm-sans resize-none shadow-sm focus:scale-105"
                                         ></textarea>
                                     </div>
 
-                                    <button className="w-full px-8 py-4 bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white font-black audiowide-regular uppercase rounded-xl hover:opacity-90 hover:scale-105 transition-all duration-300 text-sm tracking-widest shadow-lg shadow-[#FF161F]/30 active:scale-95">
+                                    <button className="w-full px-8 py-4 bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white font-black audiowide-regular uppercase rounded-xl hover:opacity-90 hover:scale-105 transition-all duration-300 text-sm tracking-widest shadow-lg shadow-[#1660C3]/30 active:scale-95">
                                         Send Message
                                     </button>
                                 </form>

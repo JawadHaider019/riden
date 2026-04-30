@@ -48,7 +48,7 @@ const HowItWorks = () => {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-12 mb-12 sm:mb-20">
                     <div className="flex-1">
                         <span
-                            className={`text-[#FF161F] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                            className={`text-[#1660C3] font-bold tracking-widest uppercase text-xs sm:text-sm block mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                                 }`}
                         >
                             How It Works
@@ -81,7 +81,7 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Steps Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-[2px] bg-[#FF161F80] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#E5E5E5]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[2px] bg-[#1660C380] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#E5E5E5]">
                     {steps.map((step, index) => {
                         const Icon = step.icon;
                         return (
@@ -91,7 +91,7 @@ const HowItWorks = () => {
                                     {/* Number Highlight with hover effect */}
                                     <span
                                         className={`text-7xl font-black text-[#0E0E0E]/10 dm-sans leading-none transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
-                                            } group-hover:text-[#FF161F]/20 group-hover:scale-110 group-hover:translate-x-2`}
+                                            } group-hover:text-[#1660C3]/20 group-hover:scale-110 group-hover:translate-x-2`}
                                         style={{ transitionDelay: `${300 + index * 150}ms` }}
                                     >
                                         {step.id}
@@ -99,7 +99,7 @@ const HowItWorks = () => {
 
                                     {/* Icon Box with hover effect */}
                                     <div
-                                        className={`w-16 h-16 bg-gradient-to-br from-[#FF161F] to-[#AD343E] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-200/50 transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                                        className={`w-16 h-16 bg-gradient-to-br from-[#1660C3] to-[#2671D8] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200/50 transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
                                             } group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-xl`}
                                         style={{ transitionDelay: `${400 + index * 150}ms` }}
                                     >
@@ -110,7 +110,7 @@ const HowItWorks = () => {
                                     <div>
                                         <h3
                                             className={`text-xl sm:text-2xl text-[#0E0E0E] audiowide-regular uppercase leading-tight transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-                                                } group-hover:text-[#FF161F] group-hover:translate-x-2`}
+                                                } group-hover:text-[#1660C3] group-hover:translate-x-2`}
                                             style={{ transitionDelay: `${500 + index * 150}ms` }}
                                         >
                                             {step.title}

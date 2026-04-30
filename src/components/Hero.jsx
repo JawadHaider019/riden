@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaApple, FaGooglePlay } from 'react-icons/fa';
-import heroImage from '../assets/hero.png';
+import heroBg from '../assets/hero.jpg';
+import heroApp from '../assets/heroapp.png';
 
 const Hero = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -16,144 +17,102 @@ const Hero = () => {
 
     return (
         <section
-            className="relative min-h-screen w-full flex items-center bg-zinc-900 overflow-hidden"
+            className="relative min-h-[100vh] md:h-[100vh] w-full flex items-center bg-zinc-900 overflow-hidden py-24 md:py-0"
             style={{
-                backgroundImage: `url(${heroImage})`,
+                backgroundImage: `url(${heroBg})`,
                 backgroundPosition: 'center center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat'
 
             }}
         >
-            {/* Overlay for better text readability */}
-            <div className="absolute inset-0 bg-black/40 z-0"></div>
+            {/* Overlay for better text readability and image depth */}
+            <div className="absolute inset-0 bg-black/60 z-10"></div>
 
             {/* Background zoom animation */}
             <div
                 className="absolute inset-0 z-0 transition-all duration-[1.5s] ease-out hidden md:block"
                 style={{
-                    backgroundImage: `url(${heroImage})`,
+                    backgroundImage: `url(${heroBg})`,
                     backgroundPosition: 'center center',
-                    backgroundSize: isVisible ? '110%' : '100%',
+                    backgroundSize: isVisible ? '105%' : '100%',
                     backgroundRepeat: 'no-repeat',
                     filter: isVisible ? 'blur(0)' : 'blur(4px)',
                     transition: 'background-size 1.5s ease-out, filter 1s ease-out'
                 }}
             ></div>
 
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-16 mt-20 md:mt-24">
-                <div className="max-w-3xl space-y-8">
-                    {/* Content Group */}
-                    <div className="flex flex-col gap-6 items-start">
-                        {/* Badge Animation */}
-                        <div
-                            className={`transform transition-all duration-700 delay-200 ${isVisible
-                                ? 'opacity-100 translate-y-0'
-                                : 'opacity-0 -translate-y-10'
-                                }`}
-                        >
-                            <span className="bg-[#FF161F]/20 border border-[#FF161F]/40 text-[#FF161F] px-4 py-2 rounded-full w-fit text-sm font-medium backdrop-blur-sm animate-pulse-slow">
-                                Available in Your City
-                            </span>
-                        </div>
-
-                        {/* Heading with staggered word animation */}
-                        <h1 className="text-5xl sm:text-6xl md:text-7xl audiowide-regular uppercase text-white leading-[1.1] tracking-tight overflow-hidden">
-                            <div className="space-y-2">
-                                <div className="flex flex-wrap">
-                                    {'Ride on your'.split(' ').map((word, i) => (
-                                        <span
-                                            key={i}
-                                            className={`inline-block transform transition-all duration-700 delay-${200 + i * 150} ${isVisible
-                                                ? 'opacity-100 translate-y-0'
-                                                : 'opacity-0 translate-y-full'
-                                                } ${i > 0 ? 'ml-2' : ''}`}
-                                        >
-                                            {word}
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="flex flex-wrap">
-                                    <span
-                                        className={`inline-block transform transition-all duration-700 delay-500 ${isVisible
-                                            ? 'opacity-100 translate-y-0'
-                                            : 'opacity-0 translate-y-full'
-                                            }`}
-                                    >
-                                        your
-                                    </span>
-                                    <span
-                                        className={`inline-block ml-2 transform transition-all duration-700 delay-650 ${isVisible
-                                            ? 'opacity-100 translate-y-0'
-                                            : 'opacity-0 translate-y-full'
-                                            }`}
-                                    >
-                                        <span className="bg-gradient-to-r from-[#FF161F] via-[#FF6B6B] to-[#FF161F] bg-clip-text text-transparent animate-text-shine">
-                                            terms.
-                                        </span>
-                                    </span>
-                                </div>
+            <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 sm:px-12 sm:py-16 py-8  mt-20">
+                <div className="flex flex-col lg:flex-row gap-12  items-center ">
+                    {/* Left Content - 60% on Desktop */}
+                    <div className="w-full lg:w-[60%]  space-y-8  flex flex-col ">
+                        <div className="flex flex-col  gap-8 ">
+                            {/* Badge */}
+                            <div
+                                className={`transform transition-all duration-700 delay-200 ${isVisible
+                                    ? 'opacity-100 translate-y-0'
+                                    : 'opacity-0 -translate-y-10'
+                                    }`}
+                            >
+                                <span className="border border-[#1660C3]/70 text-white/80 px-6 py-2 rounded-full text-xs font-medium backdrop-blur-sm">
+                                    Available In Your City
+                                </span>
                             </div>
-                        </h1>
 
-                        {/* Description with staggered word animation - Enhanced like heading */}
-                        <div className="text-sm sm:text-lg md:text-xl text-zinc-100 max-w-xl dm-sans leading-relaxed opacity-90 overflow-hidden">
-                            <div className="flex flex-wrap gap-x-1 gap-y-2">
-                                {descriptionWords.map((word, index) => (
-                                    <span
-                                        key={index}
-                                        className={`inline-block transform transition-all duration-500 delay-${Math.min(700 + index * 50, 1500)} ${isVisible
-                                            ? 'opacity-100 translate-y-0'
-                                            : 'opacity-0 translate-y-8'
-                                            }`}
-                                        style={{
-                                            transitionDelay: `${700 + index * 50}ms`,
-                                            transitionProperty: 'opacity, transform',
-                                            transitionDuration: '500ms',
-                                            transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
-                                        }}
-                                    >
-                                        {word}
-                                        {index < descriptionWords.length - 1 && '\u00A0'}
-                                    </span>
-                                ))}
+                            {/* Heading */}
+                            <h1 className="text-6xl  sm:text-6xl md:text-7xl  audiowide-regular leading-[0.85] tracking-[-0.02em] uppercase overflow-hidden">
+                                <div className="text-white drop-shadow-2xl">RIDE ON YOUR</div>
+                                <div className="text-[#1660C3] drop-shadow-2xl">TERMS.</div>
+                            </h1>
+
+                            {/* Description */}
+                            <div className="text-sm sm:text-lg md:text-xl text-white/70 max-w-2xl dm-sans leading-relaxed tracking-wide">
+                                Book A Ride In Seconds, Track Your Driver Live, And Arrive
+                                Safely Every Time. Fleet Puts You In Control Fast, Fair, And
+                                Always Reliable.
+                            </div>
+
+                            {/* Store Buttons */}
+                            <div className="flex flex-row gap-2 pt-4 w-full ">
+                                {/* App Store */}
+                                <a
+                                    href="/#"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-[#1660C3] text-white rounded-xl transition-transform hover:scale-105 shadow-xl w-[160px] sm:w-[200px] "
+                                >
+                                    <FaApple className="text-3xl sm:text-4xl" />
+                                    <div className="flex flex-col items-start leading-tight">
+                                        <span className="text-[10px] opacity-80">Download From</span>
+                                        <span className="text-sm sm:text-xl font-bold">App Store</span>
+                                    </div>
+                                </a>
+
+                                {/* Google Play */}
+                                <a
+                                    href="/#"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-900 rounded-xl transition-transform hover:scale-105 shadow-xl w-[160px] sm:w-[200px] "
+                                >
+                                    <FaGooglePlay className="text-2xl sm:text-3xl" />
+                                    <div className="flex flex-col items-start leading-tight text-left">
+                                        <span className="text-[10px] opacity-70 font-bold uppercase">Download From</span>
+                                        <span className="text-sm sm:text-xl font-bold">Google Play</span>
+                                    </div>
+                                </a>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Buttons with stagger animation */}
-                        <div className="flex flex-row gap-3 sm:gap-4 pt-4 w-full sm:w-auto pb-2 sm:pb-0">
-                            {/* Apple Store Button */}
-                            <a
-                                href="/#"
-                                className={`flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 bg-[#FF161F] text-white rounded-2xl transition-all duration-500 group shadow-lg min-w-[140px] sm:min-w-[180px] hover:shadow-red-500/30 ${isVisible
-                                    ? 'opacity-100 translate-x-0'
-                                    : 'opacity-0 -translate-x-20'
-                                    }`}
-                                style={{ transitionDelay: '800ms' }}
-                            >
-                                <FaApple className="text-2xl sm:text-3xl group-hover:animate-bounce-slow" />
-                                <div className="flex flex-col items-start leading-tight">
-                                    <span className="text-[8px] sm:text-[10px] uppercase opacity-80">Download on the</span>
-                                    <span className="text-sm sm:text-lg font-bold">App Store</span>
-                                </div>
-                            </a>
-
-                            {/* Google Play Button */}
-                            <a
-                                href="/#"
-                                className={`flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 bg-white text-gray-900 rounded-2xl transition-all duration-500 group shadow-lg min-w-[140px] sm:min-w-[180px] hover:shadow-xl hover:scale-105 ${isVisible
-                                    ? 'opacity-100 translate-x-0'
-                                    : 'opacity-0 translate-x-20'
-                                    }`}
-                                style={{ transitionDelay: '900ms' }}
-                            >
-                                <FaGooglePlay className="text-2xl sm:text-3xl group-hover:animate-bounce-slow" />
-                                <div className="flex flex-col items-start leading-tight">
-                                    <span className="text-[8px] sm:text-[10px] uppercase tracking-wider opacity-70">Get it on</span>
-                                    <span className="text-sm sm:text-lg font-bold">Google Play</span>
-                                </div>
-                            </a>
-                        </div>
+                    {/* Right App Image - 40% on Desktop */}
+                    <div
+                        className={`lg:block hidden w-full lg:w-[40%] transform pt-24 transition-all duration-1000 delay-500 flex items-center justify-center ${isVisible
+                            ? 'opacity-100 translate-x-0'
+                            : 'opacity-0 translate-x-20'
+                            }`}
+                    >
+                        <img
+                            src={heroApp}
+                            alt="Riden App"
+                            className="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-none h-auto lg:h-[800px] object-contain lg:object-cover drop-shadow-[0_20px_60px_rgba(22,96,195,0.4)] animate-float"
+                        />
                     </div>
                 </div>
             </div>
@@ -198,6 +157,15 @@ const Hero = () => {
                     }
                 }
                 
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0);
+                    }
+                    50% {
+                        transform: translateY(-20px);
+                    }
+                }
+
                 .animate-bounce-slow {
                     animation: bounce-slow 2s ease-in-out infinite;
                 }
@@ -212,6 +180,10 @@ const Hero = () => {
                 
                 .animate-pulse-slow {
                     animation: pulse-slow 2s ease-in-out infinite;
+                }
+
+                .animate-float {
+                    animation: float 6s ease-in-out infinite;
                 }
                 
                 /* Staggered delay utilities */

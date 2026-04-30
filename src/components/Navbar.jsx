@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import iconSvg from '../assets/icon.png';
 import {
     FaCar,
@@ -14,8 +15,10 @@ import {
     FaBriefcase,
     FaRocket,
     FaPhone,
-    FaHome
+    FaHome,
+    FaUserCircle
 } from 'react-icons/fa';
+import { HiUser } from 'react-icons/hi2';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -163,7 +166,7 @@ const Navbar = () => {
                                 alt="Riden Logo"
                                 className="w-10 h-10 md:w-12 md:h-12 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-md "
                             />
-                            <span className="text-3xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase md:text-3xl">
+                            <span className="text-3xl font-bold bg-gradient-to-r from-[#1660C3] to-[#2671D8] bg-clip-text text-transparent tracking-wide font-audiowide uppercase md:text-3xl">
                                 RIDEN
                             </span>
                         </a>
@@ -186,30 +189,38 @@ const Navbar = () => {
                                         className="relative px-3 py-2 group block"
                                     >
                                         <span className={`relative z-10 text-sm tracking-wide transition-all duration-300 ${activeDropdown === link.name
-                                            ? 'text-[#FF161F]'
-                                            : 'text-gray-700 group-hover:text-[#FF161F]'
+                                            ? 'text-[#1660C3]'
+                                            : 'text-gray-700 group-hover:text-[#1660C3]'
                                             }`}>
                                             {link.name}
                                         </span>
 
                                         {/* Elegant underline */}
-                                        <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-to-r from-[#FF161F] to-[#AD343E] transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${activeDropdown === link.name ? 'w-4/5' : 'w-0'
+                                        <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-to-r from-[#1660C3] to-[#2671D8] transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${activeDropdown === link.name ? 'w-4/5' : 'w-0'
                                             }`}></span>
                                     </a>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Get App Button - Desktop */}
-                        <div className="hidden lg:block">
+                        {/* Get App and User Icon - Desktop */}
+                        <div className="hidden lg:flex items-center gap-4">
                             <button
-                                className="relative  group animate-scaleIn"
+                                className="relative group animate-scaleIn"
                                 style={{ animationDelay: '0.4s' }}
                             >
-                                <div className="relative px-6 py-2.5 font-medium uppercase bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95">
+                                <div className="relative px-6 py-2.5 font-medium uppercase bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95">
                                     Download App
                                 </div>
                             </button>
+                            <Link
+                                to="/profile"
+                                className="w-10 h-10 flex items-center justify-center  text-[#1660C3] hover:text-[#1660C3]/80 transition-all duration-300 animate-scaleIn"
+                                style={{ animationDelay: '0.5s' }}
+                                title="My Profile"
+                            >
+                                <HiUser className="w-6 h-6" />
+                            </Link>
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -240,7 +251,7 @@ const Navbar = () => {
                     }}
                 >
                     {/* Decorative top line */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-black animate-widthExpand"></div>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-black animate-widthExpand"></div>
 
                     {/* Descriptive content area */}
                     <div className="h-full overflow-hidden">
@@ -259,7 +270,7 @@ const Navbar = () => {
                                                     </h2>
 
                                                     <div className="text-center">
-                                                        <div className="text-[35rem] text-[#FF161F]/10 absolute -top-20 right-0 z-10 animate-scaleIn">
+                                                        <div className="text-[35rem] text-[#1660C3]/10 absolute -top-20 right-0 z-10 animate-scaleIn">
                                                             <LargeIcon />
                                                         </div>
                                                     </div>
@@ -280,7 +291,7 @@ const Navbar = () => {
                                                                         transform: 'translateX(20px)'
                                                                     }}
                                                                 >
-                                                                    <span className="text-black font-medium text-xl group-hover:text-[#FF161F] transition-colors duration-300 dm-sans">
+                                                                    <span className="text-black font-medium text-xl group-hover:text-[#1660C3] transition-colors duration-300 dm-sans">
                                                                         {sublink.name}
                                                                     </span>
                                                                 </a>
@@ -303,7 +314,7 @@ const Navbar = () => {
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between px-6 py-5 animate-fadeIn">
                     <a href="/" className="flex items-center gap-3 group">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-[#FF161F] to-[#AD343E] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
+                        <span className="text-2xl font-bold bg-gradient-to-r from-[#1660C3] to-[#2671D8] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
                             RIDEN
                         </span>
                     </a>
@@ -353,11 +364,19 @@ const Navbar = () => {
                                 ))}
                             </div>
 
-                            {/* Mobile Get App Button */}
-                            <div className="mt-8 px-4 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-                                <button className="w-full px-6 py-4 bg-gradient-to-r from-[#FF161F] to-[#AD343E] text-white rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 text-lg font-medium">
+                            {/* Mobile Get App and Profile Button */}
+                            <div className="mt-8 px-4 space-y-4 animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+                                <button className="w-full px-6 py-4 bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 text-lg font-medium">
                                     <span>Download App</span>
                                 </button>
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="w-full px-6 py-4 text-gray-800 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 text-lg font-medium"
+                                >
+                                    <HiUser className="w-6 h-6 text-[#1660C3]" />
+                                    <span>My Profile</span>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -369,7 +388,7 @@ const Navbar = () => {
                             <div className="h-full overflow-y-auto">
                                 <div className="px-6 py-8 relative animate-slideInRight">
                                     {/* Large Background Icon */}
-                                    <div className="text-[25rem] text-[#FF161F]/10 absolute top-10 -right-40 z-0 pointer-events-none animate-scaleIn">
+                                    <div className="text-[25rem] text-[#1660C3]/10 absolute top-10 -right-40 z-0 pointer-events-none animate-scaleIn">
                                         {(() => {
                                             const Icon = mobileSubmenu.largeIcon;
                                             return <Icon />;
@@ -381,7 +400,7 @@ const Navbar = () => {
                                         {/* Back Button */}
                                         <button
                                             onClick={closeMobileSubmenu}
-                                            className="relative z-10 flex items-center gap-2 text-gray-600 hover:text-[#FF161F] transition-all duration-300 hover:-translate-x-1"
+                                            className="relative z-10 flex items-center gap-2 text-gray-600 hover:text-[#1660C3] transition-all duration-300 hover:-translate-x-1"
                                         >
                                             <FaChevronLeft className="text-sm" />
                                         </button>
@@ -405,7 +424,7 @@ const Navbar = () => {
                                                     transform: 'translateX(20px)'
                                                 }}
                                             >
-                                                <span className="relative z-10 block px-6 text-gray-700 group-hover:text-[#FF161F] transition-colors duration-300 text-lg font-medium">
+                                                <span className="relative z-10 block px-6 text-gray-700 group-hover:text-[#1660C3] transition-colors duration-300 text-lg font-medium">
                                                     {sublink.name}
                                                 </span>
                                             </a>
