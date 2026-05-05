@@ -151,14 +151,15 @@ const BookingPage = () => {
     };
 
     const renderRideDetails = () => (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5 pb-8">
             <h2 className="text-xl audiowide-regular uppercase text-[#0E0E0E] text-center mt-4">
-                Enter Your Ride Details
+                Book Your Ride
             </h2>
 
-            <div className="space-y-4">
-                <div className="flex items-center gap-4 border-b border-zinc-200 pb-2">
-                    <div className="w-6 h-6 rounded-full border-4 border-black flex-shrink-0" />
+            {/* Location Inputs */}
+            <div className="space-y-3">
+                <div className="flex items-center gap-3 border-b border-zinc-200 pb-2">
+                    <div className="w-5 h-5 rounded-full border-4 border-black flex-shrink-0" />
                     {isLoaded ? (
                         <Autocomplete
                             onLoad={(auto) => { }}
@@ -168,109 +169,130 @@ const BookingPage = () => {
                             }}>
                             <input type="text" id="pickup-ac" placeholder="From" defaultValue={pickupLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                         </Autocomplete>
-                    ) : <input type="text" placeholder="From..." />}
+                    ) : <input type="text" placeholder="From..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
 
-                <div className="flex flex-col gap-2 pl-4 border-l-2 border-dashed border-zinc-200 ml-3">
-                    {stopsList.map((stop) => (
-                        <div key={stop.id} className="flex items-center gap-4 border-b border-zinc-200 pb-2 relative">
-                            <div className="w-4 h-4 rounded-full border-4 border-zinc-400 flex-shrink-0" />
-                            {isLoaded ? (
-                                <Autocomplete
-                                    onPlaceChanged={() => {
+                {stopsList.length > 0 && (
+                    <div className="flex flex-col gap-2 pl-4 border-l-2 border-dashed border-zinc-200 ml-2">
+                        {stopsList.map((stop) => (
+                            <div key={stop.id} className="flex items-center gap-3 border-b border-zinc-200 pb-2 relative">
+                                <div className="w-3 h-3 rounded-full border-4 border-zinc-400 flex-shrink-0" />
+                                {isLoaded ? (
+                                    <Autocomplete onPlaceChanged={() => {
                                         const el = document.getElementById(`stop-${stop.id}`);
                                         if (el) { stopRefs.current[stop.id] = { value: el.value }; calculateRoute(); }
                                     }}>
-                                    <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" defaultValue={stop.val} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
-                                </Autocomplete>
-                            ) : <input type="text" placeholder="Stop..." />}
-                            <button onClick={() => handleRemoveStop(stop.id)} className="text-red-500 absolute right-0"><HiXMark /></button>
-                        </div>
-                    ))}
-                </div>
+                                        <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" defaultValue={stop.val} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                                    </Autocomplete>
+                                ) : <input type="text" placeholder="Stop..." className="w-full bg-transparent outline-none text-sm" />}
+                                <button onClick={() => handleRemoveStop(stop.id)} className="text-red-400 absolute right-0 hover:text-red-600"><HiXMark /></button>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
-                <div className="flex items-center gap-4 border-b border-zinc-200 pb-2">
-                    <div className="w-6 h-6 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
+                <div className="flex items-center gap-3 border-b border-zinc-200 pb-2">
+                    <div className="w-5 h-5 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
                     {isLoaded ? (
-                        <Autocomplete
-                            onPlaceChanged={() => {
-                                const el = document.getElementById("dropoff-ac");
-                                if (el) { dropoffRef.current = { value: el.value }; setDropoffLoc(el.value); calculateRoute(); }
-                            }}>
+                        <Autocomplete onPlaceChanged={() => {
+                            const el = document.getElementById("dropoff-ac");
+                            if (el) { dropoffRef.current = { value: el.value }; setDropoffLoc(el.value); calculateRoute(); }
+                        }}>
                             <input type="text" id="dropoff-ac" placeholder="To" defaultValue={dropoffLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                         </Autocomplete>
-                    ) : <input type="text" placeholder="To..." />}
+                    ) : <input type="text" placeholder="To..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
 
-                <button onClick={handleAddStop} className="flex items-center gap-2 text-[#1660C3] text-sm font-bold dm-sans pt-2">
-                    <HiPlusCircle className="text-xl" /> Add Stops
+                <button onClick={handleAddStop} className="flex items-center gap-2 text-[#1660C3] text-xs font-bold dm-sans pt-1">
+                    <HiPlusCircle className="text-lg" /> Add Stop
                 </button>
             </div>
 
+            {/* Compact Route Summary - single row */}
             {distanceKm > 0 && (
-                <div className="rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4">
-                    <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2">Route Summary</p>
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-white rounded-lg p-2 shadow-sm">
-                                <HiMapPin className="text-[#1660C3] text-base" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-zinc-900 text-sm">{distanceKm.toFixed(1)} km</p>
-                                <p className="text-[10px] text-zinc-400">{durationMin.toFixed(0)} min drive</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-[10px] text-zinc-400">From</p>
-                            <p className="font-bold text-[#1660C3] text-sm">C$ {(PRICING.baseFare + distanceKm * PRICING.ratePerKm + durationMin * PRICING.ratePerMin).toFixed(2)}</p>
-                        </div>
+                <div className="flex items-center justify-between bg-[#EEF4FF] rounded-xl px-4 py-3 border border-blue-100">
+                    <div className="flex items-center gap-1.5 text-zinc-700">
+                        <HiMapPin className="text-[#1660C3] text-sm flex-shrink-0" />
+                        <span className="font-bold text-sm">{distanceKm.toFixed(1)} km</span>
+                    </div>
+                    <div className="w-px h-4 bg-zinc-300" />
+                    <span className="font-bold text-sm text-zinc-700">{durationMin.toFixed(0)} min</span>
+                    <div className="w-px h-4 bg-zinc-300" />
+                    <div>
+                        <span className="font-bold text-sm text-[#1660C3]">C$ {(PRICING.baseFare + distanceKm * PRICING.ratePerKm + durationMin * PRICING.ratePerMin).toFixed(2)}</span>
+                        <span className="text-[10px] text-zinc-400 ml-1">base</span>
                     </div>
                 </div>
             )}
 
-            <div className="border-t border-zinc-100 pt-6">
-                <h3 className="text-[12px] audiowide-regular uppercase text-center mb-6 text-zinc-900">
+            {/* Service Class Tabs */}
+            <div className="border-t border-zinc-100 pt-4">
+                <h3 className="text-[11px] audiowide-regular uppercase text-center mb-4 text-zinc-500 tracking-wider">
                     Choose Service Class
                 </h3>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                     {[
-                        { id: 'Standard', label: 'Standard', icon: FaCarSide, price: 'From $35' },
-                        { id: 'Premium', label: 'Premium', icon: FaCar, price: 'From $35' },
-                        { id: 'Handicap', label: 'Handicap', icon: FaWheelchair, price: 'From $35' }
+                        { id: 'Standard', label: 'Standard', icon: FaCarSide },
+                        { id: 'Premium', label: 'Premium', icon: FaCar },
+                        { id: 'Handicap', label: 'Handicap', icon: FaWheelchair }
                     ].map((cls) => (
                         <button
                             key={cls.id}
-                            onClick={() => {
-                                setServiceClass(cls.id);
-                                setSidebarStep('selection');
-                            }}
-                            className={`flex flex-col items-center group transition-all duration-300`}
+                            onClick={() => setServiceClass(cls.id)}
+                            className="flex flex-col items-center group transition-all duration-200"
                         >
-                            <div className={`w-16 h-16 rounded-xl flex items-center justify-center mb-2 shadow-sm transition-all ${serviceClass === cls.id ? 'bg-[#1660C3] text-white' : 'bg-zinc-100 text-[#1660C3] group-hover:bg-zinc-200'}`}>
-                                <cls.icon className="text-2xl" />
+                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-1.5 transition-all ${serviceClass === cls.id ? 'bg-[#1660C3] text-white shadow-lg shadow-blue-200' : 'bg-zinc-100 text-[#1660C3] group-hover:bg-zinc-200'}`}>
+                                <cls.icon className="text-xl" />
                             </div>
-                            <span className="text-xs font-bold text-zinc-900 mb-0.5">{cls.label}</span>
-                            <span className="text-[10px] text-zinc-400 font-medium">{cls.price}</span>
+                            <span className={`text-xs font-bold transition-colors ${serviceClass === cls.id ? 'text-[#1660C3]' : 'text-zinc-600'}`}>{cls.label}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
-            <div className="mt-4 space-y-3">
+            {/* Inline Car List */}
+            <div className="space-y-2">
+                {carOptions[serviceClass].map((car) => (
+                    <div
+                        key={car.id}
+                        onClick={() => setSelectedCar(car)}
+                        className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all border-2 ${selectedCar?.id === car.id ? 'bg-[#1660C3] border-transparent' : 'bg-white border-zinc-100 hover:border-blue-100 shadow-sm'}`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <img src={car.image} alt={car.name} className="w-20 h-auto object-contain" />
+                            <div>
+                                <h5 className={`font-bold text-sm ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.name}</h5>
+                                <div className={`flex items-center gap-1.5 text-[10px] mt-0.5 ${selectedCar?.id === car.id ? 'text-white/80' : 'text-zinc-400'}`}>
+                                    <span>{durationMin > 0 ? `${durationMin.toFixed(0)} min` : car.time}</span>
+                                    <span>·</span>
+                                    <span className="uppercase">{car.type}</span>
+                                    <span>·</span>
+                                    <span>{car.capacity} seats</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span className={`font-bold text-sm flex-shrink-0 ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.price}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
                 <button
                     onClick={() => setStep('for_whom')}
-                    className="w-full flex items-center justify-between bg-zinc-100/50 p-4 rounded-xl hover:bg-zinc-100 transition-colors"
+                    className="w-full flex items-center justify-between bg-zinc-100/70 p-4 rounded-xl hover:bg-zinc-100 transition-colors"
                 >
                     <span className="text-sm font-bold text-zinc-600">For Someone Else</span>
-                    <HiChevronRight className="text-zinc-600" />
+                    <HiChevronRight className="text-zinc-500" />
                 </button>
 
                 <button
+                    disabled={!selectedCar}
                     onClick={() => {
                         if (!isLogin) setStep('phone');
-                        else setSidebarStep('selection');
+                        else setSidebarStep('request');
                     }}
-                    className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity"
+                    className={`w-full text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg transition-all ${selectedCar ? 'bg-gradient-to-r from-[#1660C3] to-[#2671D8] shadow-blue-200/50 hover:opacity-90' : 'bg-zinc-300 shadow-none cursor-not-allowed'}`}
                 >
                     {isLogin ? 'Continue' : 'Log in To continue'}
                 </button>
