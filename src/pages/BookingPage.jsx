@@ -21,6 +21,9 @@ import {
     FaApple
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useJsApiLoader, GoogleMap, DirectionsRenderer, Autocomplete, Polyline, Marker } from '@react-google-maps/api';
+
+// Imports and constants moved around
 
 // Import assets
 import standardCar from '../assets/standard_car.png';
@@ -28,7 +31,31 @@ import suvCar from '../assets/suv_car.png';
 import vanCar from '../assets/van_car.png';
 import driverProfile from '../assets/driver_profile.png';
 
+const libraries = ['places'];
+const center = { lat: 31.5204, lng: 74.3587 };
+const PRICING = { baseFare: 5.00, ratePerKm: 1.20, ratePerMin: 0.30, stopFee: 2.50 };
+const VEHICLE_MULTIPLIERS = { 'Standard': 1.0, 'Premium': 1.8, 'Handicap': 1.5 };
+const darkGlowStyle = [
+    { elementType: "geometry", stylers: [{ color: "#0d1117" }] },
+    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#0d1117" }] },
+    { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#161b22" }] },
+    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#1c2128" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2d333b" }] },
+    { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#ff0000ff" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] }
+];
+
 const BookingPage = () => {
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_KEY || "",
+        libraries: libraries
+    });
+
     const [sidebarStep, setSidebarStep] = useState('details'); // details, selection, request, searching, arriving
     const [serviceClass, setServiceClass] = useState('Standard');
     const [selectedCar, setSelectedCar] = useState(null);
@@ -36,17 +63,90 @@ const BookingPage = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
     const [step, setStep] = useState('booking'); // for modals: booking, for_whom, phone, otp
 
+    const [, setMap] = useState(null);
+    const [directionsResponse, setDirectionsResponse] = useState(null);
+    const [routePath, setRoutePath] = useState([]);
+
+    const [pickupLoc, setPickupLoc] = useState('');
+    const [dropoffLoc, setDropoffLoc] = useState('');
+    const [stopsList, setStopsList] = useState([]);
+
+    // Dynamic Stats
+    const [distanceKm, setDistanceKm] = useState(0);
+    const [durationMin, setDurationMin] = useState(0);
+
+    const pickupRef = React.useRef(null);
+    const dropoffRef = React.useRef(null);
+    const stopRefs = React.useRef({});
+
+    const handleAddStop = () => {
+        setStopsList([...stopsList, { id: Date.now(), val: '' }]);
+    };
+
+    const handleRemoveStop = (id) => {
+        setStopsList(stopsList.filter(s => s.id !== id));
+        setTimeout(calculateRoute, 100);
+    };
+
+    const calculateRoute = async () => {
+        if (!pickupRef.current || !dropoffRef.current || !window.google) return;
+
+        try {
+            const directionsService = new window.google.maps.DirectionsService();
+            const waypoints = stopsList.filter(s => !!stopRefs.current[s.id]).map(s => ({
+                location: stopRefs.current[s.id].value,
+                stopover: true
+            }));
+
+            const results = await directionsService.route({
+                origin: pickupRef.current.value,
+                destination: dropoffRef.current.value,
+                waypoints: waypoints,
+                travelMode: window.google.maps.TravelMode.DRIVING,
+            });
+
+            setDirectionsResponse(results);
+            const route = results.routes[0];
+            setRoutePath(route.overview_path);
+
+            let totalDist = 0;
+            let totalDur = 0;
+            route.legs.forEach(leg => {
+                totalDist += leg.distance.value;
+                totalDur += leg.duration.value;
+            });
+
+            setDistanceKm(totalDist / 1000);
+            setDurationMin(totalDur / 60);
+        } catch (error) {
+            console.error("Calculate route error", error);
+        }
+    };
+
+    const getCalculatedPriceStr = (carName) => {
+        if (distanceKm === 0) return 'C$ 70.00'; // Default
+        let mult = 1;
+        if (carName.includes('SUV')) mult = VEHICLE_MULTIPLIERS.Premium;
+        if (carName.includes('Van') || carName.includes('Premium')) mult = 2.0;
+        if (carName.includes('Assist')) mult = VEHICLE_MULTIPLIERS.Handicap;
+
+        const distCost = distanceKm * PRICING.ratePerKm;
+        const timeCost = durationMin * PRICING.ratePerMin;
+        const stopsCost = stopsList.length * PRICING.stopFee;
+        const subtotal = PRICING.baseFare + distCost + timeCost + stopsCost;
+        return `C$ ${(subtotal * mult).toFixed(2)}`;
+    };
     const carOptions = {
         Standard: [
-            { id: 1, name: 'Riden Standard', type: 'Sedan', price: 'C$ 70.00', time: '4 min', capacity: 3, image: standardCar },
-            { id: 2, name: 'Riden SUV', type: 'SUV', price: 'C$ 70.00', time: '4 min', capacity: 4, image: suvCar },
-            { id: 3, name: 'Riden Van', type: 'Van', price: 'C$ 70.00', time: '4 min', capacity: 6, image: vanCar },
+            { id: 1, name: 'Riden Standard', type: 'Sedan', price: getCalculatedPriceStr('Riden Standard'), time: '4 min', capacity: 3, image: standardCar },
+            { id: 2, name: 'Riden SUV', type: 'SUV', price: getCalculatedPriceStr('Riden SUV'), time: '4 min', capacity: 4, image: suvCar },
+            { id: 3, name: 'Riden Van', type: 'Van', price: getCalculatedPriceStr('Riden Van'), time: '4 min', capacity: 6, image: vanCar },
         ],
         Premium: [
-            { id: 4, name: 'Riden Premium', type: 'Luxury', price: 'C$ 120.00', time: '5 min', capacity: 3, image: standardCar },
+            { id: 4, name: 'Riden Premium', type: 'Luxury', price: getCalculatedPriceStr('Riden Premium'), time: '5 min', capacity: 3, image: standardCar },
         ],
         Handicap: [
-            { id: 5, name: 'Riden Assist', type: 'Special', price: 'C$ 85.00', time: '8 min', capacity: 2, image: vanCar },
+            { id: 5, name: 'Riden Assist', type: 'Special', price: getCalculatedPriceStr('Riden Assist'), time: '8 min', capacity: 2, image: vanCar },
         ]
     };
 
@@ -59,26 +159,60 @@ const BookingPage = () => {
             <div className="space-y-4">
                 <div className="flex items-center gap-4 border-b border-zinc-200 pb-2">
                     <div className="w-6 h-6 rounded-full border-4 border-black flex-shrink-0" />
-                    <input
-                        type="text"
-                        placeholder="From"
-                        className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
-                    />
+                    {isLoaded ? (
+                        <Autocomplete
+                            onLoad={(auto) => { }}
+                            onPlaceChanged={() => {
+                                const el = document.getElementById("pickup-ac");
+                                if (el) { pickupRef.current = { value: el.value }; setPickupLoc(el.value); calculateRoute(); }
+                            }}>
+                            <input type="text" id="pickup-ac" placeholder="From" defaultValue={pickupLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                        </Autocomplete>
+                    ) : <input type="text" placeholder="From..." />}
+                </div>
+
+                <div className="flex flex-col gap-2 pl-4 border-l-2 border-dashed border-zinc-200 ml-3">
+                    {stopsList.map((stop) => (
+                        <div key={stop.id} className="flex items-center gap-4 border-b border-zinc-200 pb-2 relative">
+                            <div className="w-4 h-4 rounded-full border-4 border-zinc-400 flex-shrink-0" />
+                            {isLoaded ? (
+                                <Autocomplete
+                                    onPlaceChanged={() => {
+                                        const el = document.getElementById(`stop-${stop.id}`);
+                                        if (el) { stopRefs.current[stop.id] = { value: el.value }; calculateRoute(); }
+                                    }}>
+                                    <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" defaultValue={stop.val} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                                </Autocomplete>
+                            ) : <input type="text" placeholder="Stop..." />}
+                            <button onClick={() => handleRemoveStop(stop.id)} className="text-red-500 absolute right-0"><HiXMark /></button>
+                        </div>
+                    ))}
                 </div>
 
                 <div className="flex items-center gap-4 border-b border-zinc-200 pb-2">
                     <div className="w-6 h-6 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
-                    <input
-                        type="text"
-                        placeholder="To"
-                        className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
-                    />
+                    {isLoaded ? (
+                        <Autocomplete
+                            onPlaceChanged={() => {
+                                const el = document.getElementById("dropoff-ac");
+                                if (el) { dropoffRef.current = { value: el.value }; setDropoffLoc(el.value); calculateRoute(); }
+                            }}>
+                            <input type="text" id="dropoff-ac" placeholder="To" defaultValue={dropoffLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                        </Autocomplete>
+                    ) : <input type="text" placeholder="To..." />}
                 </div>
 
-                <button className="flex items-center gap-2 text-[#1660C3] text-sm font-bold dm-sans pt-2">
+                <button onClick={handleAddStop} className="flex items-center gap-2 text-[#1660C3] text-sm font-bold dm-sans pt-2">
                     <HiPlusCircle className="text-xl" /> Add Stops
                 </button>
             </div>
+
+            {distanceKm > 0 && (
+                <div className="flex justify-between text-sm bg-blue-50 p-3 rounded-lg text-blue-900 font-bold dm-sans">
+                    <span>{distanceKm.toFixed(1)} km</span>
+                    <span>{durationMin.toFixed(0)} min</span>
+                </div>
+            )}
 
             <div className="border-t border-zinc-100 pt-6">
                 <h3 className="text-[12px] audiowide-regular uppercase text-center mb-6 text-zinc-900">
@@ -132,7 +266,7 @@ const BookingPage = () => {
                     {isLogin ? 'Continue' : 'Log in To continue'}
                 </button>
             </div>
-        </div>
+        </div >
     );
 
     const renderCarSelection = () => (
@@ -144,14 +278,19 @@ const BookingPage = () => {
             <div className="space-y-4 bg-white p-4 rounded-2xl mb-8 shadow-sm">
                 <div className="flex items-center gap-4 border-b border-zinc-100 pb-2">
                     <div className="w-6 h-6 rounded-full border-4 border-black flex-shrink-0" />
-                    <input type="text" value="Pickup Location" readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs" />
+                    <input type="text" value={pickupLoc || "Pickup Location"} readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs truncate" />
+                </div>
+                <div className="flex flex-col pl-4 border-l-2 border-dashed border-zinc-200 ml-3">
+                    {stopsList.map(s => (
+                        <div key={s.id} className="text-xs text-zinc-500 py-1">Stop: {stopRefs.current[s.id]?.value || "Pending..."}</div>
+                    ))}
                 </div>
                 <div className="flex items-center gap-4 border-b border-zinc-100 pb-2">
                     <div className="w-6 h-6 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
-                    <input type="text" value="Destination Location" readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs" />
+                    <input type="text" value={dropoffLoc || "Destination Location"} readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs truncate" />
                 </div>
-                <button className="flex items-center gap-2 text-[#1660C3] text-xs font-bold dm-sans">
-                    <HiPlusCircle className="text-lg" /> Add Stops
+                <button onClick={() => setSidebarStep('details')} className="flex items-center gap-2 text-[#1660C3] text-xs font-bold dm-sans">
+                    <HiArrowLeft className="text-lg" /> Edit Locations
                 </button>
             </div>
 
@@ -195,7 +334,7 @@ const BookingPage = () => {
                                 <div>
                                     <h5 className={`font-bold text-sm ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.name}</h5>
                                     <div className={`flex items-center gap-2 text-[10px] ${selectedCar?.id === car.id ? 'text-white/80' : 'text-zinc-400'}`}>
-                                        <span className="flex items-center gap-1"><HiMapPin size={10} /> {car.time}</span>
+                                        <span className="flex items-center gap-1"><HiMapPin size={10} /> {durationMin ? durationMin.toFixed(0) + ' min' : car.time}</span>
                                         <span className="uppercase">{car.type}</span>
                                         <span className="flex items-center gap-1 font-bold">● {car.capacity}</span>
                                     </div>
@@ -258,7 +397,7 @@ const BookingPage = () => {
                     <div>
                         <h4 className="font-bold text-lg text-zinc-900">{selectedCar?.name}</h4>
                         <div className="flex items-center gap-4 text-xs text-zinc-600 mt-1">
-                            <span className="flex items-center gap-1"><HiMapPin /> {selectedCar?.time}</span>
+                            <span className="flex items-center gap-1"><HiMapPin /> {durationMin ? durationMin.toFixed(0) + ' min' : selectedCar?.time}</span>
                             <span className="uppercase">{selectedCar?.type}</span>
                             <span className="flex items-center gap-1 font-bold">● {selectedCar?.capacity}</span>
                         </div>
@@ -650,18 +789,52 @@ const BookingPage = () => {
     return (
         <div className="relative h-[calc(100vh-72px)] lg:h-[calc(100vh-84px)] w-full bg-zinc-100 overflow-hidden mt-[72px] lg:mt-[84px]">
             {/* Real Map (Google Maps Embed) */}
-            <div className="absolute inset-0 z-0">
-                <iframe
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    scrolling="no"
-                    marginHeight="0"
-                    marginWidth="0"
-                    title="Real Map"
-                    src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=New%20York%20City+(Riden)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                    className="grayscale contrast-125 opacity-80"
-                ></iframe>
+            <div className="absolute inset-0 z-0 bg-zinc-900">
+                {isLoaded ? (
+                    <GoogleMap
+                        mapContainerStyle={{ width: '100%', height: '100%' }}
+                        center={center}
+                        zoom={16}
+                        options={{ disableDefaultUI: true, styles: darkGlowStyle }}
+                        onLoad={m => setMap(m)}
+                    >
+                        {directionsResponse && (
+                            <DirectionsRenderer
+                                directions={directionsResponse}
+                                options={{ suppressPolylines: true, suppressMarkers: true }}
+                            />
+                        )}
+                        {routePath && routePath.length > 0 && (
+                            <>
+                                <Polyline path={routePath} options={{ strokeColor: '#b2cfffff', strokeWeight: 6, strokeOpacity: 0.5, zIndex: 1 }} />
+                                <Polyline path={routePath} options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }} />
+                                <Polyline path={routePath} options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }} />
+                            </>
+                        )}
+                        {directionsResponse && (() => {
+                            const route = directionsResponse.routes[0];
+                            const legs = route.legs;
+                            let customMarkers = [];
+                            customMarkers.push(
+                                <Marker key="pickup" position={legs[0].start_location} zIndex={999}
+                                    icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#3b83f6d2', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
+                            );
+                            for (let i = 0; i < legs.length - 1; i++) {
+                                customMarkers.push(
+                                    <Marker key={`stop-${i}`} position={legs[i].end_location} zIndex={998}
+                                        icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#9ca3af', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2, scale: 4 }} />
+                                );
+                            }
+                            customMarkers.push(
+                                <Marker key="dropoff" position={legs[legs.length - 1].end_location} zIndex={999}
+                                    icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#f63b3bce', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
+                            );
+                            return customMarkers;
+                        })()}
+                    </GoogleMap>
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white">Loading Map...</div>
+                )}
                 <div className="absolute inset-0 bg-[#1660C3]/5 pointer-events-none" />
             </div>
 
