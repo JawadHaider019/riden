@@ -896,12 +896,22 @@ const BookingPage = () => {
                             />
                         )}
 
-                        {routePath && routePath.length > 0 && directionsResponse && (
-                            <React.Fragment key={`${pickupLoc}-${dropoffLoc}-${stopsList.length}`}>
+                        {/* NEW: Explicitly check for both response and path to avoid ghosting */}
+                        {(directionsResponse && routePath && routePath.length > 0) ? (
+                            <React.Fragment key={`route-${requestIdRef.current}`}>
                                 {/* Glowing Route Layers */}
-                                <Polyline path={routePath} options={{ strokeColor: '#b2cfffff', strokeWeight: 6, strokeOpacity: 0.5, zIndex: 1 }} />
-                                <Polyline path={routePath} options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }} />
-                                <Polyline path={routePath} options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }} />
+                                <Polyline
+                                    path={routePath}
+                                    options={{ strokeColor: '#b2cfffff', strokeWeight: 6, strokeOpacity: 0.5, zIndex: 1 }}
+                                />
+                                <Polyline
+                                    path={routePath}
+                                    options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }}
+                                />
+                                <Polyline
+                                    path={routePath}
+                                    options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }}
+                                />
 
                                 {/* Stop Markers */}
                                 {(() => {
@@ -910,14 +920,14 @@ const BookingPage = () => {
                                     let stopMarkers = [];
                                     for (let i = 0; i < legs.length - 1; i++) {
                                         stopMarkers.push(
-                                            <Marker key={`stop-${i}`} position={legs[i].end_location} zIndex={998}
+                                            <Marker key={`stop-${i}-${requestIdRef.current}`} position={legs[i].end_location} zIndex={998}
                                                 icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#9ca3af', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2, scale: 4 }} />
                                         );
                                     }
                                     return stopMarkers;
                                 })()}
                             </React.Fragment>
-                        )}
+                        ) : null}
                     </GoogleMap>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white">Loading Map...</div>
