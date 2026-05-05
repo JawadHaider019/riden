@@ -34,7 +34,7 @@ import driverProfile from '../assets/driver_profile.png';
 const libraries = ['places'];
 const center = { lat: 31.5204, lng: 74.3587 };
 const PRICING = { baseFare: 5.00, ratePerKm: 1.20, ratePerMin: 0.30, stopFee: 2.50 };
-const VEHICLE_MULTIPLIERS = { 'Standard': 1.0, 'Premium': 1.8, 'Handicap': 1.5 };
+
 const darkGlowStyle = [
     { elementType: "geometry", stylers: [{ color: "#0d1117" }] },
     { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
@@ -123,32 +123,41 @@ const BookingPage = () => {
         }
     };
 
-    const getCalculatedPriceStr = (carName) => {
-        if (distanceKm === 0) return 'C$ 70.00'; // Default
-        let mult = 1;
-        if (carName.includes('SUV')) mult = VEHICLE_MULTIPLIERS.Premium;
-        if (carName.includes('Van') || carName.includes('Premium')) mult = 2.0;
-        if (carName.includes('Assist')) mult = VEHICLE_MULTIPLIERS.Handicap;
-
-        const distCost = distanceKm * PRICING.ratePerKm;
-        const timeCost = durationMin * PRICING.ratePerMin;
-        const stopsCost = stopsList.length * PRICING.stopFee;
-        const subtotal = PRICING.baseFare + distCost + timeCost + stopsCost;
-        return `C$ ${(subtotal * mult).toFixed(2)}`;
-    };
-    const carOptions = {
+    const carOptionsData = {
         Standard: [
-            { id: 1, name: 'Riden Standard', type: 'Sedan', price: getCalculatedPriceStr('Riden Standard'), time: '4 min', capacity: 3, image: standardCar },
-            { id: 2, name: 'Riden SUV', type: 'SUV', price: getCalculatedPriceStr('Riden SUV'), time: '4 min', capacity: 4, image: suvCar },
-            { id: 3, name: 'Riden Van', type: 'Van', price: getCalculatedPriceStr('Riden Van'), time: '4 min', capacity: 6, image: vanCar },
+            { id: 1, name: 'Riden Standard', type: 'Sedan', baseRate: 1.25, time: '4 min', capacity: 3, image: standardCar },
+            { id: 2, name: 'Riden SUV', type: 'SUV', baseRate: 1.70, time: '4 min', capacity: 4, image: suvCar },
+            { id: 3, name: 'Riden Van', type: 'Van', baseRate: 2.15, time: '4 min', capacity: 6, image: vanCar },
         ],
         Premium: [
-            { id: 4, name: 'Riden Premium', type: 'Luxury', price: getCalculatedPriceStr('Riden Premium'), time: '5 min', capacity: 3, image: standardCar },
+            { id: 4, name: 'Riden Premium', type: 'Luxury', baseRate: 2.80, time: '5 min', capacity: 3, image: standardCar },
         ],
         Handicap: [
-            { id: 5, name: 'Riden Assist', type: 'Special', price: getCalculatedPriceStr('Riden Assist'), time: '8 min', capacity: 2, image: vanCar },
+            { id: 5, name: 'Riden Assist', type: 'Special', baseRate: 1.95, time: '8 min', capacity: 2, image: vanCar },
         ]
     };
+
+    const getCalculatedPriceStr = (carName) => {
+        if (distanceKm === 0) return 'C$ 0.00';
+        const allCars = [...carOptionsData.Standard, ...carOptionsData.Premium, ...carOptionsData.Handicap];
+        const car = allCars.find(c => c.name === carName);
+        const rate = car?.baseRate || PRICING.ratePerKm;
+
+        const distCost = distanceKm * rate;
+        const timeCost = durationMin * PRICING.ratePerMin;
+        const stopsCost = stopsList.length * PRICING.stopFee;
+        const total = PRICING.baseFare + distCost + timeCost + stopsCost;
+
+        return `C$ ${total.toFixed(2)}`;
+    };
+
+    const carOptions = {};
+    Object.keys(carOptionsData).forEach(key => {
+        carOptions[key] = carOptionsData[key].map(car => ({
+            ...car,
+            price: getCalculatedPriceStr(car.name)
+        }));
+    });
 
     const renderRideDetails = () => (
         <div className="flex flex-col gap-5 pb-8">
@@ -218,13 +227,13 @@ const BookingPage = () => {
                     <div className="w-px h-4 bg-zinc-300" />
                     <span className="font-bold text-sm text-zinc-700">{durationMin.toFixed(0)} min</span>
                     <div className="w-px h-4 bg-zinc-300" />
-                    <div>
+                    <div className="flex items-center gap-1">
                         <span className="font-bold text-sm text-[#1660C3]">
                             {selectedCar
                                 ? selectedCar.price
                                 : carOptions[serviceClass][0].price}
                         </span>
-                        {!selectedCar && <span className="text-[10px] text-zinc-400 ml-1">from</span>}
+                        {!selectedCar && <span className="text-[10px] text-zinc-400">from</span>}
                     </div>
                 </div>
             )}
@@ -302,115 +311,6 @@ const BookingPage = () => {
                 </button>
             </div>
         </div >
-    );
-
-    const renderCarSelection = () => (
-        <div className="flex flex-col h-full bg-[#F9F9F9] -mx-6 md:-mx-8 -my-8 p-6 md:p-8 overflow-y-auto scrollbar-hide">
-            <h2 className="text-xl audiowide-regular uppercase text-[#0E0E0E] text-center mt-4 mb-6 md:mb-8">
-                Enter Your Ride Details
-            </h2>
-
-            <div className="space-y-4 bg-white p-4 rounded-2xl mb-8 shadow-sm">
-                <div className="flex items-center gap-4 border-b border-zinc-100 pb-2">
-                    <div className="w-6 h-6 rounded-full border-4 border-black flex-shrink-0" />
-                    <input type="text" value={pickupLoc || "Pickup Location"} readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs truncate" />
-                </div>
-                <div className="flex flex-col pl-4 border-l-2 border-dashed border-zinc-200 ml-3">
-                    {stopsList.map(s => (
-                        <div key={s.id} className="text-xs text-zinc-500 py-1">Stop: {stopRefs.current[s.id]?.value || "Pending..."}</div>
-                    ))}
-                </div>
-                <div className="flex items-center gap-4 border-b border-zinc-100 pb-2">
-                    <div className="w-6 h-6 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
-                    <input type="text" value={dropoffLoc || "Destination Location"} readOnly className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-xs truncate" />
-                </div>
-                <button onClick={() => setSidebarStep('details')} className="flex items-center gap-2 text-[#1660C3] text-xs font-bold dm-sans">
-                    <HiArrowLeft className="text-lg" /> Edit Locations
-                </button>
-            </div>
-
-            <div className="border-t border-zinc-200 pt-6">
-                <h3 className="text-[12px] audiowide-regular uppercase text-center mb-6 text-zinc-900 border-b border-zinc-100 pb-4">
-                    Choose Service Class
-                </h3>
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                    {[
-                        { id: 'Standard', label: 'Standard', icon: FaCarSide },
-                        { id: 'Premium', label: 'Premium', icon: FaCar },
-                        { id: 'Handicap', label: 'Handicap', icon: FaWheelchair }
-                    ].map((cls) => (
-                        <button
-                            key={cls.id}
-                            onClick={() => setServiceClass(cls.id)}
-                            className={`flex flex-col items-center group transition-all duration-300`}
-                        >
-                            <div className={`w-16 h-16 rounded-xl flex items-center justify-center mb-2 shadow-sm transition-all ${serviceClass === cls.id ? 'bg-[#1660C3] text-white' : 'bg-white text-[#1660C3] group-hover:bg-zinc-50'}`}>
-                                <cls.icon className="text-2xl" />
-                            </div>
-                            <span className="text-xs font-bold text-zinc-900">{cls.label}</span>
-                        </button>
-                    ))}
-                </div>
-
-                <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-bold text-zinc-800">{serviceClass} Cars</h4>
-                    <span className="text-xs text-zinc-400 font-medium">{carOptions[serviceClass]?.length} Options</span>
-                </div>
-
-                <div className="space-y-3 mb-8">
-                    {carOptions[serviceClass].map((car) => (
-                        <div
-                            key={car.id}
-                            onClick={() => setSelectedCar(car)}
-                            className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border-2 ${selectedCar?.id === car.id ? 'bg-[#60A3FF] border-transparent' : 'bg-white border-transparent hover:border-zinc-100'}`}
-                        >
-                            <div className="flex items-center gap-4">
-                                <img src={car.image} alt={car.name} className="w-24 h-auto object-contain" />
-                                <div>
-                                    <h5 className={`font-bold text-sm ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.name}</h5>
-                                    <div className={`flex items-center gap-2 text-[10px] ${selectedCar?.id === car.id ? 'text-white/80' : 'text-zinc-400'}`}>
-                                        <span className="flex items-center gap-1"><HiMapPin size={10} /> {durationMin ? durationMin.toFixed(0) + ' min' : car.time}</span>
-                                        <span className="uppercase">{car.type}</span>
-                                        <span className="flex items-center gap-1 font-bold">● {car.capacity}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <span className={`font-bold text-sm ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.price}</span>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="space-y-3">
-                    {distanceKm > 0 && selectedCar && (
-                        <div className="flex justify-between items-center bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                            <div>
-                                <h4 className="font-bold text-zinc-900 text-sm">Ride Summary</h4>
-                                <p className="text-xs text-zinc-500 mt-0.5">{distanceKm.toFixed(1)} km &bull; {durationMin.toFixed(0)} min</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] text-zinc-400 font-semibold uppercase">Fare</p>
-                                <p className="font-bold text-[#1660C3] text-lg">{selectedCar.price}</p>
-                            </div>
-                        </div>
-                    )}
-                    <button
-                        onClick={() => setStep('for_whom')}
-                        className="w-full flex items-center justify-between bg-zinc-100/50 p-4 rounded-xl hover:bg-zinc-100 transition-colors"
-                    >
-                        <span className="text-sm font-bold text-zinc-600">For Someone Else</span>
-                        <HiChevronRight className="text-zinc-600" />
-                    </button>
-
-                    <button
-                        disabled={!selectedCar}
-                        onClick={() => setSidebarStep('request')}
-                        className={`w-full text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg transition-all ${selectedCar ? 'bg-gradient-to-r from-[#1660C3] to-[#2671D8] shadow-blue-200/50' : 'bg-zinc-300 shadow-none cursor-not-allowed'}`}
-                    >
-                        Continue
-                    </button>
-                </div>
-            </div>
-        </div>
     );
 
     const renderRequestRide = () => (
@@ -817,7 +717,7 @@ const BookingPage = () => {
                     <button
                         onClick={() => {
                             setStep('booking');
-                            setSidebarStep('selection');
+                            setSidebarStep('details');
                         }}
                         className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-[1.5rem] font-bold dm-sans uppercase tracking-wider shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2"
                     >
@@ -924,7 +824,7 @@ const BookingPage = () => {
                         className="h-full"
                     >
                         {sidebarStep === 'details' && renderRideDetails()}
-                        {sidebarStep === 'selection' && renderCarSelection()}
+                        {(sidebarStep === 'selection' || sidebarStep === 'details') && null}
                         {sidebarStep === 'request' && renderRequestRide()}
                         {sidebarStep === 'searching' && renderSearching()}
                         {sidebarStep === 'arriving' && renderCarArriving()}
