@@ -86,6 +86,11 @@ const BookingPage = () => {
     const dropoffRef = React.useRef(null);
     const stopRefs = React.useRef({});
 
+    // Request tracking to prevent race conditions
+    const requestIdRef = React.useRef(0);
+    const lastValidPickup = React.useRef('');
+    const lastValidDropoff = React.useRef('');
+
     const handleAddStop = () => {
         setStopsList([...stopsList, { id: Date.now(), val: '' }]);
     };
@@ -96,10 +101,10 @@ const BookingPage = () => {
     };
 
     const calculateRoute = async () => {
-        const pickupVal = pickupRef.current?.value || pickupLoc;
-        const dropoffVal = dropoffRef.current?.value || dropoffLoc;
+        const id = ++requestIdRef.current;
+        const pickupVal = pickupRef.current?.value || lastValidPickup.current;
+        const dropoffVal = dropoffRef.current?.value || lastValidDropoff.current;
 
-        // Immediate cleanup of path if inputs are incomplete
         if (!pickupVal || !dropoffVal || !window.google) {
             setDirectionsResponse(null);
             setRoutePath([]);
@@ -124,16 +129,13 @@ const BookingPage = () => {
                 travelMode: window.google.maps.TravelMode.DRIVING,
             });
 
-            // CHECK AGAIN IF INPUTS ARE STILL VALID BEFORE APPLYING (Race condition fix)
-            const currentPickup = pickupRef.current?.value || pickupLoc;
-            const currentDropoff = dropoffRef.current?.value || dropoffLoc;
-            if (!currentPickup || !currentDropoff) return;
+            // If a newer request was started or input cleared, discard this one
+            if (id !== requestIdRef.current || !pickupRef.current?.value || !dropoffRef.current?.value) return;
 
             setDirectionsResponse(results);
             const route = results.routes[0];
-            setRoutePath(route.overview_path);
+            setRoutePath([...route.overview_path]); // New reference
 
-            // SYNC COORDINATES WITH ROUTE FOR PERFECT ACCURACY
             setPickupCoords(route.legs[0].start_location);
             setDropoffCoords(route.legs[route.legs.length - 1].end_location);
 
@@ -147,11 +149,13 @@ const BookingPage = () => {
             setDistanceKm(totalDist / 1000);
             setDurationMin(totalDur / 60);
         } catch (error) {
-            console.error("Calculate route error", error);
-            setDirectionsResponse(null);
-            setRoutePath([]);
-            setDistanceKm(0);
-            setDurationMin(0);
+            if (id === requestIdRef.current) {
+                console.error("Calculate route error", error);
+                setDirectionsResponse(null);
+                setRoutePath([]);
+                setDistanceKm(0);
+                setDurationMin(0);
+            }
         }
     };
 
@@ -224,8 +228,10 @@ const BookingPage = () => {
                                     const place = pickupAutocomplete.getPlace();
                                     if (place.geometry) {
                                         setPickupCoords(place.geometry.location);
-                                        setPickupLoc(place.formatted_address || place.name);
-                                        pickupRef.current = { value: place.formatted_address || place.name };
+                                        const addr = place.formatted_address || place.name;
+                                        setPickupLoc(addr);
+                                        lastValidPickup.current = addr;
+                                        pickupRef.current = { value: addr };
                                         calculateRoute();
                                     }
                                 }
@@ -238,7 +244,9 @@ const BookingPage = () => {
                                 onChange={(e) => {
                                     setPickupLoc(e.target.value);
                                     pickupRef.current = { value: e.target.value };
-                                    // Clear marker and path immediately when text changes
+                                    lastValidPickup.current = e.target.value;
+                                    // Clear marker and path immediately 
+                                    requestIdRef.current++; // Invalidate pending requests
                                     setPickupCoords(null);
                                     setDirectionsResponse(null);
                                     setRoutePath([]);
@@ -302,7 +310,9 @@ const BookingPage = () => {
                                 onChange={(e) => {
                                     setDropoffLoc(e.target.value);
                                     dropoffRef.current = { value: e.target.value };
-                                    // Clear marker and path immediately when text changes
+                                    lastValidDropoff.current = e.target.value;
+                                    // Clear marker and path immediately 
+                                    requestIdRef.current++; // Invalidate pending requests
                                     setDropoffCoords(null);
                                     setDirectionsResponse(null);
                                     setRoutePath([]);
