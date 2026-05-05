@@ -142,14 +142,14 @@ const Safety = () => {
                             We don't treat safety as a checkbox. It's built into every layer of Fleet — from driver verification to your live trip share.
                         </p>
 
-                        {/* <a
+                        <a
                             href="/about"
                             className={`inline-flex items-center gap-4 text-[#1660C3] font-black dm-sans uppercase tracking-wider text-xs sm:text-sm border-b-2 border-[#1660C3]/20 pb-2 hover:border-[#1660C3] transition-all duration-300 cursor-pointer ${visibleSections.leftContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                                 }`}
                             style={{ transitionDelay: visibleSections.leftContent ? '0.8s' : '0s' }}
                         >
                             Learn more about safety
-                        </a> */}
+                        </a>
                     </div>
 
                     {/* Right Visual (Feature Cards) */}

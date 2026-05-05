@@ -145,7 +145,7 @@ const Features = () => {
     return (
         <section className="pt-16 pb-32 sm:pb-16 bg-white overflow-hidden max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
             <div className="flex flex-col gap-2">
-                {/* Header Section */}
+
                 <div ref={headerRef} className="mb-16">
                     <span
                         className={`text-sm font-bold uppercase tracking-widest text-[#1660C3] block mb-4 dm-sans transition-all duration-700 ${visibleSections.header ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
@@ -170,7 +170,7 @@ const Features = () => {
                     </h2>
                 </div>
 
-                {/* Grid Layout - each card triggers individually */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {features.map((feature, index) => (
                         <div
@@ -185,7 +185,7 @@ const Features = () => {
                             }}
                         >
                             <div className="space-y-6">
-                                {/* Icon and Heading row */}
+
                                 <div className="flex items-center gap-4">
                                     <div className={`p-3 rounded-xl transition-all duration-300 group-hover:scale-110 ${feature.isDark ? 'bg-[#1660C3] text-white' : 'bg-white text-[#1660C3]'}`}>
                                         {feature.icon}

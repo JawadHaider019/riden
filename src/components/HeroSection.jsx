@@ -10,17 +10,17 @@ const HeroSection = ({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Trigger animations after component mounts
+
         setIsVisible(true);
     }, []);
 
-    // Split main heading into words for staggered animation
+
     const headingWords1 = mainHeading1.split(' ');
     const headingWords2 = mainHeading2.split(' ');
 
     return (
         <section className="relative w-full h-[80vh] md:h-[80vh] lg:h-[80vh] py-16 md:py-0 flex items-center justify-center overflow-hidden">
-            {/* Cinematic Background Image with Zoom Animation */}
+
             <div
                 className="absolute inset-0 z-0"
                 style={{
@@ -31,12 +31,10 @@ const HeroSection = ({
                     transition: 'transform 8s ease-out'
                 }}
             >
-                {/* Advanced Gradient Overlay for Text Readability */}
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20"></div>
                 <div className="absolute inset-0 bg-black/30"></div>
             </div>
-
-            {/* Content Container */}
             <div className="relative z-10 w-full max-w-8xl mx-auto">
                 <div className="max-w-5xl px-4 sm:px-8 lg:px-16 space-y-6 lg:space-y-8">
                     {/* Small Heading / Tagline */}

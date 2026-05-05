@@ -7,11 +7,11 @@ const Hero = () => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Trigger animations after component mounts
+
         setIsVisible(true);
     }, []);
 
-    // Split description into words for staggered animation
+
     const descriptionText = "Book a ride in seconds, track your driver live, and arrive safely every time. Fleet puts you in control—fast, fair, and always reliable.";
     const descriptionWords = descriptionText.split(' ');
 
@@ -44,7 +44,7 @@ const Hero = () => {
 
             <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 sm:px-12 sm:py-16 py-8  mt-20">
                 <div className="flex flex-col lg:flex-row gap-12  items-center ">
-                    {/* Left Content - 60% on Desktop */}
+
                     <div className="w-full lg:w-[60%]  space-y-8  flex flex-col ">
                         <div className="flex flex-col  gap-8 ">
                             {/* Badge */}
@@ -86,7 +86,6 @@ const Hero = () => {
                                     </div>
                                 </a>
 
-                                {/* Google Play */}
                                 <a
                                     href="/#"
                                     className="flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-900 rounded-xl transition-transform hover:scale-105 shadow-xl w-[160px] sm:w-[200px] "

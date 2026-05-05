@@ -69,20 +69,20 @@ const Navbar = () => {
         }
     ];
 
-    // Handle scroll effect
+
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
 
-        // Trigger navbar animation after mount
+
         setTimeout(() => setIsNavVisible(true), 100);
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Prevent body scroll when mobile menu is open
+
     useEffect(() => {
         if (isMobileMenuOpen) {
             document.body.style.overflow = 'hidden';
