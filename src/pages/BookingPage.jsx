@@ -63,13 +63,20 @@ const BookingPage = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
     const [step, setStep] = useState('booking'); // for modals: booking, for_whom, phone, otp
 
-    const [, setMap] = useState(null);
+    const [map, setMap] = useState(null);
     const [directionsResponse, setDirectionsResponse] = useState(null);
     const [routePath, setRoutePath] = useState([]);
 
     const [pickupLoc, setPickupLoc] = useState('');
     const [dropoffLoc, setDropoffLoc] = useState('');
     const [stopsList, setStopsList] = useState([]);
+
+    const [pickupCoords, setPickupCoords] = useState(null);
+    const [dropoffCoords, setDropoffCoords] = useState(null);
+
+    const [pickupAutocomplete, setPickupAutocomplete] = useState(null);
+    const [dropoffAutocomplete, setDropoffAutocomplete] = useState(null);
+    const stopAutocompletes = React.useRef({});
 
     // Dynamic Stats
     const [distanceKm, setDistanceKm] = useState(0);
@@ -127,6 +134,21 @@ const BookingPage = () => {
         }
     };
 
+    React.useEffect(() => {
+        if (map && pickupCoords && !directionsResponse) {
+            map.panTo(pickupCoords);
+            map.setZoom(15);
+        }
+    }, [pickupCoords, map, directionsResponse]);
+
+    React.useEffect(() => {
+        if (map && directionsResponse) {
+            const bounds = new window.google.maps.LatLngBounds();
+            directionsResponse.routes[0].overview_path.forEach(point => bounds.extend(point));
+            map.fitBounds(bounds);
+        }
+    }, [directionsResponse, map]);
+
     const carOptionsData = {
         Standard: [
             { id: 1, name: 'Riden Standard', type: 'Sedan', baseRate: 1.25, time: '4 min', capacity: 3, image: standardCar },
@@ -175,10 +197,17 @@ const BookingPage = () => {
                     <div className="w-5 h-5 rounded-full border-4 border-black flex-shrink-0" />
                     {isLoaded ? (
                         <Autocomplete
-                            onLoad={(auto) => { }}
+                            onLoad={setPickupAutocomplete}
                             onPlaceChanged={() => {
-                                const el = document.getElementById("pickup-ac");
-                                if (el) { pickupRef.current = { value: el.value }; setPickupLoc(el.value); calculateRoute(); }
+                                if (pickupAutocomplete) {
+                                    const place = pickupAutocomplete.getPlace();
+                                    if (place.geometry) {
+                                        setPickupCoords(place.geometry.location);
+                                        setPickupLoc(place.formatted_address || place.name);
+                                        pickupRef.current = { value: place.formatted_address || place.name };
+                                        calculateRoute();
+                                    }
+                                }
                             }}>
                             <input type="text" id="pickup-ac" placeholder="From" defaultValue={pickupLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                         </Autocomplete>
@@ -191,10 +220,18 @@ const BookingPage = () => {
                             <div key={stop.id} className="flex items-center gap-3 border-b border-zinc-200 pb-2 relative">
                                 <div className="w-3 h-3 rounded-full border-4 border-zinc-400 flex-shrink-0" />
                                 {isLoaded ? (
-                                    <Autocomplete onPlaceChanged={() => {
-                                        const el = document.getElementById(`stop-${stop.id}`);
-                                        if (el) { stopRefs.current[stop.id] = { value: el.value }; calculateRoute(); }
-                                    }}>
+                                    <Autocomplete
+                                        onLoad={(auto) => stopAutocompletes.current[stop.id] = auto}
+                                        onPlaceChanged={() => {
+                                            const auto = stopAutocompletes.current[stop.id];
+                                            if (auto) {
+                                                const place = auto.getPlace();
+                                                if (place.geometry) {
+                                                    stopRefs.current[stop.id] = { value: place.formatted_address || place.name };
+                                                    calculateRoute();
+                                                }
+                                            }
+                                        }}>
                                         <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" defaultValue={stop.val} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                                     </Autocomplete>
                                 ) : <input type="text" placeholder="Stop..." className="w-full bg-transparent outline-none text-sm" />}
@@ -207,10 +244,19 @@ const BookingPage = () => {
                 <div className="flex items-center gap-3 border-b border-zinc-200 pb-2">
                     <div className="w-5 h-5 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
                     {isLoaded ? (
-                        <Autocomplete onPlaceChanged={() => {
-                            const el = document.getElementById("dropoff-ac");
-                            if (el) { dropoffRef.current = { value: el.value }; setDropoffLoc(el.value); calculateRoute(); }
-                        }}>
+                        <Autocomplete
+                            onLoad={setDropoffAutocomplete}
+                            onPlaceChanged={() => {
+                                if (dropoffAutocomplete) {
+                                    const place = dropoffAutocomplete.getPlace();
+                                    if (place.geometry) {
+                                        setDropoffCoords(place.geometry.location);
+                                        setDropoffLoc(place.formatted_address || place.name);
+                                        dropoffRef.current = { value: place.formatted_address || place.name };
+                                        calculateRoute();
+                                    }
+                                }
+                            }}>
                             <input type="text" id="dropoff-ac" placeholder="To" defaultValue={dropoffLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                         </Autocomplete>
                     ) : <input type="text" placeholder="To..." className="w-full bg-transparent outline-none text-sm" />}
@@ -769,6 +815,23 @@ const BookingPage = () => {
                         options={{ disableDefaultUI: true, styles: darkGlowStyle }}
                         onLoad={m => setMap(m)}
                     >
+                        {/* Independent Pickup Marker */}
+                        {pickupCoords && (
+                            <Marker
+                                position={pickupCoords}
+                                zIndex={1000}
+                                icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#3b82f6', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 8 }}
+                            />
+                        )}
+
+                        {/* Independent Dropoff Marker */}
+                        {dropoffCoords && (
+                            <Marker
+                                position={dropoffCoords}
+                                zIndex={1000}
+                                icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#ef4444', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 8 }}
+                            />
+                        )}
 
                         {routePath && routePath.length > 0 && directionsResponse && (
                             <React.Fragment key={`${pickupLoc}-${dropoffLoc}-${stopsList.length}`}>
@@ -777,26 +840,18 @@ const BookingPage = () => {
                                 <Polyline path={routePath} options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }} />
                                 <Polyline path={routePath} options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }} />
 
-                                {/* Custom Markers */}
+                                {/* Stop Markers */}
                                 {(() => {
                                     const route = directionsResponse.routes[0];
                                     const legs = route.legs;
-                                    let customMarkers = [];
-                                    customMarkers.push(
-                                        <Marker key="pickup" position={legs[0].start_location} zIndex={999}
-                                            icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#3b83f6d2', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
-                                    );
+                                    let stopMarkers = [];
                                     for (let i = 0; i < legs.length - 1; i++) {
-                                        customMarkers.push(
+                                        stopMarkers.push(
                                             <Marker key={`stop-${i}`} position={legs[i].end_location} zIndex={998}
                                                 icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#9ca3af', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2, scale: 4 }} />
                                         );
                                     }
-                                    customMarkers.push(
-                                        <Marker key="dropoff" position={legs[legs.length - 1].end_location} zIndex={999}
-                                            icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#f63b3bce', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
-                                    );
-                                    return customMarkers;
+                                    return stopMarkers;
                                 })()}
                             </React.Fragment>
                         )}
