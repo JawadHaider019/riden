@@ -140,6 +140,13 @@ const BookingPage = () => {
         setStopsList([...stopsList, { id: Date.now(), val: '' }]);
     };
 
+    const handleStopChange = (id, val) => {
+        setStopsList(stopsList.map(s => s.id === id ? { ...s, val } : s));
+        stopRefs.current[id] = { value: val };
+        requestIdRef.current++;
+        clearRouteFromMap();
+    };
+
     const handleRemoveStop = (id) => {
         setStopsList(stopsList.filter(s => s.id !== id));
         setTimeout(calculateRoute, 100);
@@ -287,7 +294,7 @@ const BookingPage = () => {
                                 type="text"
                                 id="pickup-ac"
                                 placeholder="From"
-                                defaultValue={pickupLoc}
+                                value={pickupLoc}
                                 onChange={(e) => {
                                     setPickupLoc(e.target.value);
                                     pickupRef.current = { value: e.target.value };
@@ -315,12 +322,14 @@ const BookingPage = () => {
                                             if (auto) {
                                                 const place = auto.getPlace();
                                                 if (place.geometry) {
-                                                    stopRefs.current[stop.id] = { value: place.formatted_address || place.name };
+                                                    const addr = place.formatted_address || place.name;
+                                                    setStopsList(stopsList.map(s => s.id === stop.id ? { ...s, val: addr } : s));
+                                                    stopRefs.current[stop.id] = { value: addr };
                                                     calculateRoute();
                                                 }
                                             }
                                         }}>
-                                        <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" defaultValue={stop.val} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                                        <input type="text" id={`stop-${stop.id}`} placeholder="Stop Location" value={stop.val} onChange={(e) => handleStopChange(stop.id, e.target.value)} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
                                     </Autocomplete>
                                 ) : <input type="text" placeholder="Stop..." className="w-full bg-transparent outline-none text-sm" />}
                                 <button onClick={() => handleRemoveStop(stop.id)} className="text-red-400 absolute right-0 hover:text-red-600"><HiXMark /></button>
@@ -349,7 +358,7 @@ const BookingPage = () => {
                                 type="text"
                                 id="dropoff-ac"
                                 placeholder="To"
-                                defaultValue={dropoffLoc}
+                                value={dropoffLoc}
                                 onChange={(e) => {
                                     setDropoffLoc(e.target.value);
                                     dropoffRef.current = { value: e.target.value };
