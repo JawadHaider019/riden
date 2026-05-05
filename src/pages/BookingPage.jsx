@@ -124,6 +124,11 @@ const BookingPage = () => {
                 travelMode: window.google.maps.TravelMode.DRIVING,
             });
 
+            // CHECK AGAIN IF INPUTS ARE STILL VALID BEFORE APPLYING (Race condition fix)
+            const currentPickup = pickupRef.current?.value || pickupLoc;
+            const currentDropoff = dropoffRef.current?.value || dropoffLoc;
+            if (!currentPickup || !currentDropoff) return;
+
             setDirectionsResponse(results);
             const route = results.routes[0];
             setRoutePath(route.overview_path);
