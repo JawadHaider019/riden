@@ -99,14 +99,14 @@ const BookingPage = () => {
         const pickupVal = pickupRef.current?.value || pickupLoc;
         const dropoffVal = dropoffRef.current?.value || dropoffLoc;
 
+        // Immediate cleanup of path if inputs are incomplete
         if (!pickupVal || !dropoffVal || !window.google) {
-            if (!dropoffVal) {
-                setDirectionsResponse(null);
-                setRoutePath([]);
-                setDropoffCoords(null);
-                setDistanceKm(0);
-                setDurationMin(0);
-            }
+            setDirectionsResponse(null);
+            setRoutePath([]);
+            setDistanceKm(0);
+            setDurationMin(0);
+            if (!dropoffVal) setDropoffCoords(null);
+            if (!pickupVal) setPickupCoords(null);
             return;
         }
 
