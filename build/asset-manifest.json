@@ -1,14 +1,13 @@
 {
   "files": {
     "main.css": "/static/css/main.8d2f049f.css",
-    "main.js": "/static/js/main.a1006434.js",
+    "main.js": "/static/js/main.e9581223.js",
     "static/media/hero.jpg": "/static/media/hero.e1bc3fa3e17b7c835a7b.jpg",
     "static/media/contact.jpg": "/static/media/contact.8ad8f174e4cb2c148d48.jpg",
     "static/media/about.jpg": "/static/media/about.5e0296cbeaa3994fd4d3.jpg",
     "static/media/app1.png": "/static/media/app1.0d5a2cb1eed3927a2d31.png",
     "static/media/app2.png": "/static/media/app2.21ccd7abc783caa331d8.png",
     "static/media/heroapp.png": "/static/media/heroapp.5f66dc5c043448538b7e.png",
-    "static/media/passengerapp.png": "/static/media/passengerapp.67c56883f238ee73c1e3.png",
     "static/media/van_car.png": "/static/media/van_car.704301b3be2f00ce4b6b.png",
     "static/media/suv_car.png": "/static/media/suv_car.363faf6a41e104e7fd36.png",
     "static/media/standard_car.png": "/static/media/standard_car.a0953b226dc385c00a92.png",
@@ -16,10 +15,10 @@
     "static/media/driver_profile.png": "/static/media/driver_profile.b0f40f32a8c45c3757ba.png",
     "index.html": "/index.html",
     "main.8d2f049f.css.map": "/static/css/main.8d2f049f.css.map",
-    "main.a1006434.js.map": "/static/js/main.a1006434.js.map"
+    "main.e9581223.js.map": "/static/js/main.e9581223.js.map"
   },
   "entrypoints": [
     "static/css/main.8d2f049f.css",
-    "static/js/main.a1006434.js"
+    "static/js/main.e9581223.js"
   ]
 }
