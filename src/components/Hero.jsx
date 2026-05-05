@@ -12,9 +12,6 @@ const Hero = () => {
     }, []);
 
 
-    const descriptionText = "Book a ride in seconds, track your driver live, and arrive safely every time. Fleet puts you in control—fast, fair, and always reliable.";
-    const descriptionWords = descriptionText.split(' ');
-
     return (
         <section
             className="relative min-h-[100vh] md:h-[100vh] w-full flex items-center bg-zinc-900 overflow-hidden py-24 md:py-0"

@@ -11,10 +11,7 @@ import {
     FaPlus,
     FaChevronLeft,
     FaPaperPlane,
-    FaCamera,
-    FaComments,
-    FaSmile,
-    FaMicrophone
+    FaCamera
 } from 'react-icons/fa';
 
 const ProfilePage = () => {

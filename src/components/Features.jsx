@@ -7,7 +7,6 @@ import {
     HiHeart,
     HiArrowRight
 } from 'react-icons/hi2';
-import AppImg from '../assets/passengerapp.png';
 import App1 from '../assets/app1.png';
 import App2 from '../assets/app2.png';
 

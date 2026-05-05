@@ -15,8 +15,7 @@ import {
     FaBriefcase,
     FaRocket,
     FaPhone,
-    FaHome,
-    FaUserCircle
+    FaHome
 } from 'react-icons/fa';
 import { HiUser } from 'react-icons/hi2';
 
