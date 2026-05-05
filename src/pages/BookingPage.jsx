@@ -9,7 +9,6 @@ import {
     HiChevronDown
 } from 'react-icons/hi2';
 import {
-    FaCar,
     FaShareAlt,
     FaCommentDots,
     FaSmile,
