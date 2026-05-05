@@ -33,7 +33,24 @@ import driverProfile from '../assets/driver_profile.png';
 
 const libraries = ['places'];
 const center = { lat: 31.5204, lng: 74.3587 };
-const PRICING = { baseFare: 5.00, ratePerKm: 1.20, ratePerMin: 0.30, stopFee: 2.50 };
+const PRICING = {
+    baseFare: 5.00,
+    ratePerKm: 1.20,
+    ratePerMin: 0.30,
+    stopFee: 2.50
+};
+
+const VEHICLE_MULTIPLIERS = {
+    1: 1.0, // Economy
+    2: 1.2, // Comfort
+    3: 1.4, // Sedan
+    4: 2.0, // Premium Sedan
+    5: 1.8, // SUV
+    6: 2.5, // Premium SUV
+    7: 2.2, // Van / XL
+    8: 1.3, // Electric
+    9: 1.5  // Handicap
+};
 
 const darkGlowStyle = [
     { elementType: "geometry", stylers: [{ color: "#0d1117" }] },
@@ -203,25 +220,28 @@ const BookingPage = () => {
 
     const carOptionsData = {
         Standard: [
-            { id: 1, name: 'Riden Standard', type: 'Sedan', baseRate: 1.25, time: '4 min', capacity: 3, image: standardCar },
-            { id: 2, name: 'Riden SUV', type: 'SUV', baseRate: 1.70, time: '4 min', capacity: 4, image: suvCar },
-            { id: 3, name: 'Riden Van', type: 'Van', baseRate: 2.15, time: '4 min', capacity: 6, image: vanCar },
+            { id: 1, name: 'Economy', type: 'Budget', time: '2 min', capacity: 4, image: standardCar },
+            { id: 2, name: 'Comfort', type: 'Relax', time: '4 min', capacity: 4, image: standardCar },
+            { id: 3, name: 'Sedan', type: 'Standard', time: '3 min', capacity: 4, image: standardCar },
         ],
         Premium: [
-            { id: 4, name: 'Riden Premium', type: 'Luxury', baseRate: 2.80, time: '5 min', capacity: 3, image: standardCar },
+            { id: 4, name: 'Premium Sedan', type: 'Luxury', time: '5 min', capacity: 4, image: standardCar },
+            { id: 5, name: 'SUV', type: 'Large', time: '4 min', capacity: 6, image: suvCar },
+            { id: 6, name: 'Premium SUV', type: 'VIP', time: '6 min', capacity: 6, image: suvCar },
         ],
-        Handicap: [
-            { id: 5, name: 'Riden Assist', type: 'Special', baseRate: 1.95, time: '8 min', capacity: 2, image: vanCar },
+        Special: [
+            { id: 7, name: 'Van / XL', type: 'Group', time: '7 min', capacity: 8, image: vanCar },
+            { id: 8, name: 'Electric', type: 'Eco', time: '4 min', capacity: 4, image: standardCar },
+            { id: 9, name: 'Handicap', type: 'Assist', time: '8 min', capacity: 2, image: vanCar },
         ]
     };
 
-    const getCalculatedPriceStr = (carName) => {
+    const getCalculatedPriceStr = (carId) => {
         if (distanceKm === 0) return 'C$ 0.00';
-        const allCars = [...carOptionsData.Standard, ...carOptionsData.Premium, ...carOptionsData.Handicap];
-        const car = allCars.find(c => c.name === carName);
-        const rate = car?.baseRate || PRICING.ratePerKm;
 
-        const distCost = distanceKm * rate;
+        const multiplier = VEHICLE_MULTIPLIERS[carId] || 1.0;
+
+        const distCost = distanceKm * PRICING.ratePerKm * multiplier;
         const timeCost = durationMin * PRICING.ratePerMin;
         const stopsCost = stopsList.length * PRICING.stopFee;
         const total = PRICING.baseFare + distCost + timeCost + stopsCost;
@@ -233,7 +253,7 @@ const BookingPage = () => {
     Object.keys(carOptionsData).forEach(key => {
         carOptions[key] = carOptionsData[key].map(car => ({
             ...car,
-            price: getCalculatedPriceStr(car.name)
+            price: getCalculatedPriceStr(car.id)
         }));
     });
 
@@ -379,7 +399,7 @@ const BookingPage = () => {
                     {[
                         { id: 'Standard', label: 'Standard', icon: FaCarSide },
                         { id: 'Premium', label: 'Premium', icon: FaCar },
-                        { id: 'Handicap', label: 'Handicap', icon: FaWheelchair }
+                        { id: 'Special', label: 'Special', icon: FaWheelchair }
                     ].map((cls) => (
                         <button
                             key={cls.id}
