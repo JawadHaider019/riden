@@ -21,7 +21,7 @@ import {
     FaApple
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useJsApiLoader, GoogleMap, DirectionsRenderer, Autocomplete, Polyline, Marker } from '@react-google-maps/api';
+import { useJsApiLoader, GoogleMap, Autocomplete, Polyline, Marker } from '@react-google-maps/api';
 
 // Imports and constants moved around
 
@@ -120,6 +120,10 @@ const BookingPage = () => {
             setDurationMin(totalDur / 60);
         } catch (error) {
             console.error("Calculate route error", error);
+            setDirectionsResponse(null);
+            setRoutePath([]);
+            setDistanceKm(0);
+            setDurationMin(0);
         }
     };
 
@@ -765,39 +769,37 @@ const BookingPage = () => {
                         options={{ disableDefaultUI: true, styles: darkGlowStyle }}
                         onLoad={m => setMap(m)}
                     >
-                        {directionsResponse && (
-                            <DirectionsRenderer
-                                directions={directionsResponse}
-                                options={{ suppressPolylines: true, suppressMarkers: true }}
-                            />
-                        )}
-                        {routePath && routePath.length > 0 && (
-                            <>
+
+                        {routePath && routePath.length > 0 && directionsResponse && (
+                            <React.Fragment key={`${pickupLoc}-${dropoffLoc}-${stopsList.length}`}>
+                                {/* Glowing Route Layers */}
                                 <Polyline path={routePath} options={{ strokeColor: '#b2cfffff', strokeWeight: 6, strokeOpacity: 0.5, zIndex: 1 }} />
                                 <Polyline path={routePath} options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }} />
                                 <Polyline path={routePath} options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }} />
-                            </>
+
+                                {/* Custom Markers */}
+                                {(() => {
+                                    const route = directionsResponse.routes[0];
+                                    const legs = route.legs;
+                                    let customMarkers = [];
+                                    customMarkers.push(
+                                        <Marker key="pickup" position={legs[0].start_location} zIndex={999}
+                                            icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#3b83f6d2', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
+                                    );
+                                    for (let i = 0; i < legs.length - 1; i++) {
+                                        customMarkers.push(
+                                            <Marker key={`stop-${i}`} position={legs[i].end_location} zIndex={998}
+                                                icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#9ca3af', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2, scale: 4 }} />
+                                        );
+                                    }
+                                    customMarkers.push(
+                                        <Marker key="dropoff" position={legs[legs.length - 1].end_location} zIndex={999}
+                                            icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#f63b3bce', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
+                                    );
+                                    return customMarkers;
+                                })()}
+                            </React.Fragment>
                         )}
-                        {directionsResponse && (() => {
-                            const route = directionsResponse.routes[0];
-                            const legs = route.legs;
-                            let customMarkers = [];
-                            customMarkers.push(
-                                <Marker key="pickup" position={legs[0].start_location} zIndex={999}
-                                    icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#3b83f6d2', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
-                            );
-                            for (let i = 0; i < legs.length - 1; i++) {
-                                customMarkers.push(
-                                    <Marker key={`stop-${i}`} position={legs[i].end_location} zIndex={998}
-                                        icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#9ca3af', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2, scale: 4 }} />
-                                );
-                            }
-                            customMarkers.push(
-                                <Marker key="dropoff" position={legs[legs.length - 1].end_location} zIndex={999}
-                                    icon={{ path: window.google.maps.SymbolPath.CIRCLE, fillColor: '#f63b3bce', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 7 }} />
-                            );
-                            return customMarkers;
-                        })()}
                     </GoogleMap>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white">Loading Map...</div>
