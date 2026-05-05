@@ -231,12 +231,14 @@ const BookingPage = () => {
                                 placeholder="From"
                                 defaultValue={pickupLoc}
                                 onChange={(e) => {
-                                    if (!e.target.value) {
-                                        setPickupCoords(null);
-                                        setPickupLoc('');
-                                        pickupRef.current = { value: '' };
-                                        calculateRoute();
-                                    }
+                                    setPickupLoc(e.target.value);
+                                    pickupRef.current = { value: e.target.value };
+                                    // Clear marker and path immediately when text changes
+                                    setPickupCoords(null);
+                                    setDirectionsResponse(null);
+                                    setRoutePath([]);
+                                    setDistanceKm(0);
+                                    setDurationMin(0);
                                 }}
                                 className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
                             />
@@ -293,11 +295,14 @@ const BookingPage = () => {
                                 placeholder="To"
                                 defaultValue={dropoffLoc}
                                 onChange={(e) => {
-                                    if (!e.target.value) {
-                                        setDropoffLoc('');
-                                        dropoffRef.current = { value: '' };
-                                        calculateRoute();
-                                    }
+                                    setDropoffLoc(e.target.value);
+                                    dropoffRef.current = { value: e.target.value };
+                                    // Clear marker and path immediately when text changes
+                                    setDropoffCoords(null);
+                                    setDirectionsResponse(null);
+                                    setRoutePath([]);
+                                    setDistanceKm(0);
+                                    setDurationMin(0);
                                 }}
                                 className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
                             />
