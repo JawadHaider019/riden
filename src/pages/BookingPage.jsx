@@ -10,8 +10,6 @@ import {
 } from 'react-icons/hi2';
 import {
     FaCar,
-    FaCarSide,
-    FaWheelchair,
     FaShareAlt,
     FaCommentDots,
     FaSmile,
@@ -67,6 +65,18 @@ const darkGlowStyle = [
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] }
 ];
 
+const CAR_OPTIONS_DATA = [
+    { id: 1, name: 'Economy', type: 'Budget', time: '2 min', capacity: 4, image: standardCar },
+    { id: 2, name: 'Comfort', type: 'Relax', time: '4 min', capacity: 4, image: standardCar },
+    { id: 3, name: 'Sedan', type: 'Standard', time: '3 min', capacity: 4, image: standardCar },
+    { id: 4, name: 'Premium Sedan', type: 'Luxury', time: '5 min', capacity: 4, image: standardCar },
+    { id: 5, name: 'SUV', type: 'Large', time: '4 min', capacity: 6, image: suvCar },
+    { id: 6, name: 'Premium SUV', type: 'VIP', time: '6 min', capacity: 6, image: suvCar },
+    { id: 7, name: 'Van / XL', type: 'Group', time: '7 min', capacity: 8, image: vanCar },
+    { id: 8, name: 'Electric', type: 'Eco', time: '4 min', capacity: 4, image: standardCar },
+    { id: 9, name: 'Handicap', type: 'Assist', time: '8 min', capacity: 2, image: vanCar },
+];
+
 const BookingPage = () => {
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_KEY || "",
@@ -74,8 +84,7 @@ const BookingPage = () => {
     });
 
     const [sidebarStep, setSidebarStep] = useState('details'); // details, selection, request, searching, arriving
-    const [serviceClass, setServiceClass] = useState('Standard');
-    const [selectedCar, setSelectedCar] = useState(null);
+    const [selectedCar, setSelectedCar] = useState(CAR_OPTIONS_DATA[0]);
     const [isLogin] = useState(false); // Toggle to test 'LOG IN TO CONTINUE'
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
     const [step, setStep] = useState('booking'); // for modals: booking, for_whom, phone, otp
@@ -225,23 +234,6 @@ const BookingPage = () => {
         }
     }, [directionsResponse, map]);
 
-    const carOptionsData = {
-        Standard: [
-            { id: 1, name: 'Economy', type: 'Budget', time: '2 min', capacity: 4, image: standardCar },
-            { id: 2, name: 'Comfort', type: 'Relax', time: '4 min', capacity: 4, image: standardCar },
-            { id: 3, name: 'Sedan', type: 'Standard', time: '3 min', capacity: 4, image: standardCar },
-        ],
-        Premium: [
-            { id: 4, name: 'Premium Sedan', type: 'Luxury', time: '5 min', capacity: 4, image: standardCar },
-            { id: 5, name: 'SUV', type: 'Large', time: '4 min', capacity: 6, image: suvCar },
-            { id: 6, name: 'Premium SUV', type: 'VIP', time: '6 min', capacity: 6, image: suvCar },
-        ],
-        Special: [
-            { id: 7, name: 'Van / XL', type: 'Group', time: '7 min', capacity: 8, image: vanCar },
-            { id: 8, name: 'Electric', type: 'Eco', time: '4 min', capacity: 4, image: standardCar },
-            { id: 9, name: 'Handicap', type: 'Assist', time: '8 min', capacity: 2, image: vanCar },
-        ]
-    };
 
     const getCalculatedPriceStr = (carId) => {
         if (distanceKm === 0) return 'C$ 0.00';
@@ -256,13 +248,16 @@ const BookingPage = () => {
         return `C$ ${total.toFixed(2)}`;
     };
 
-    const carOptions = {};
-    Object.keys(carOptionsData).forEach(key => {
-        carOptions[key] = carOptionsData[key].map(car => ({
-            ...car,
-            price: getCalculatedPriceStr(car.id)
-        }));
-    });
+    const getBaseRatePerKm = (carId) => {
+        const multiplier = VEHICLE_MULTIPLIERS[carId] || 1.0;
+        return (PRICING.ratePerKm * multiplier).toFixed(2);
+    };
+
+    const carOptions = CAR_OPTIONS_DATA.map(car => ({
+        ...car,
+        price: getCalculatedPriceStr(car.id),
+        baseRate: getBaseRatePerKm(car.id)
+    }));
 
     const renderRideDetails = () => (
         <div className="flex flex-col gap-5 pb-8">
@@ -285,6 +280,7 @@ const BookingPage = () => {
                                             const addr = place.formatted_address || place.name;
                                             setPickupLoc(addr);
                                             lastValidPickup.current = addr;
+                                            setPickupCoords(place.geometry.location);
                                             calculateRoute();
                                         }
                                     }
@@ -360,6 +356,7 @@ const BookingPage = () => {
                                             const addr = place.formatted_address || place.name;
                                             setDropoffLoc(addr);
                                             lastValidDropoff.current = addr;
+                                            setDropoffCoords(place.geometry.location);
                                             calculateRoute();
                                         }
                                     }
@@ -402,61 +399,30 @@ const BookingPage = () => {
                     <div className="flex items-center gap-1">
                         <span className="font-bold text-sm text-[#1660C3]">
                             {selectedCar
-                                ? selectedCar.price
-                                : carOptions[serviceClass][0].price}
+                                ? getCalculatedPriceStr(selectedCar.id)
+                                : carOptions[0].price}
                         </span>
                         {!selectedCar && <span className="text-[10px] text-zinc-400">from</span>}
                     </div>
                 </div>
             )}
 
-            {/* Service Class Tabs */}
-            <div className="border-t border-zinc-100 pt-4">
-                <h3 className="text-[11px] audiowide-regular uppercase text-center mb-4 text-zinc-500 tracking-wider">
-                    Choose Service Class
-                </h3>
-                <div className="grid grid-cols-3 gap-3">
-                    {[
-                        { id: 'Standard', label: 'Standard', icon: FaCarSide },
-                        { id: 'Premium', label: 'Premium', icon: FaCar },
-                        { id: 'Special', label: 'Special', icon: FaWheelchair }
-                    ].map((cls) => (
-                        <button
-                            key={cls.id}
-                            onClick={() => setServiceClass(cls.id)}
-                            className="flex flex-col items-center group transition-all duration-200"
-                        >
-                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-1.5 transition-all ${serviceClass === cls.id ? 'bg-[#1660C3] text-white shadow-lg shadow-blue-200' : 'bg-zinc-100 text-[#1660C3] group-hover:bg-zinc-200'}`}>
-                                <cls.icon className="text-xl" />
-                            </div>
-                            <span className={`text-xs font-bold transition-colors ${serviceClass === cls.id ? 'text-[#1660C3]' : 'text-zinc-600'}`}>{cls.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             {/* Inline Car List */}
-            <div className="space-y-2">
-                {carOptions[serviceClass].map((car) => (
+            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                {carOptions.map((car) => (
                     <div
                         key={car.id}
                         onClick={() => setSelectedCar(car)}
                         className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all border-2 ${selectedCar?.id === car.id ? 'bg-[#1660C3] border-transparent' : 'bg-white border-zinc-100 hover:border-blue-100 shadow-sm'}`}
                     >
                         <div className="flex items-center gap-3">
-                            <img src={car.image} alt={car.name} className="w-20 h-auto object-contain" />
+                            <img src={car.image} alt={car.name} className="w-16 h-auto object-contain" />
                             <div>
                                 <h5 className={`font-bold text-sm ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.name}</h5>
-                                <div className={`flex items-center gap-1.5 text-[10px] mt-0.5 ${selectedCar?.id === car.id ? 'text-white/80' : 'text-zinc-400'}`}>
-                                    <span>{durationMin > 0 ? `${durationMin.toFixed(0)} min` : car.time}</span>
-                                    <span>·</span>
-                                    <span className="uppercase">{car.type}</span>
-                                    <span>·</span>
-                                    <span>{car.capacity} seats</span>
-                                </div>
+
                             </div>
                         </div>
-                        <span className={`font-bold text-sm flex-shrink-0 ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}>{car.price}</span>
+                        <span className={`font-bold text-sm flex-shrink-0 ${selectedCar?.id === car.id ? 'text-white' : 'text-zinc-900'}`}> <span>C$ {car.baseRate}/km</span></span>
                     </div>
                 ))}
             </div>
@@ -516,7 +482,7 @@ const BookingPage = () => {
                             <span className="flex items-center gap-1 font-bold">● {selectedCar?.capacity}</span>
                         </div>
                     </div>
-                    <span className="text-xl font-bold text-zinc-900">{selectedCar?.price}</span>
+                    <span className="text-xl font-bold text-zinc-900">{getCalculatedPriceStr(selectedCar?.id)}</span>
                 </div>
             </div>
 
@@ -1028,6 +994,21 @@ const BookingPage = () => {
                     <HiMapPin />
                 </button>
             </div>
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 5px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #dfe7ef;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #cbd5e1;
+                }
+            `}</style>
         </div>
     );
 };

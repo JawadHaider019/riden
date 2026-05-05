@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import iconSvg from '../assets/icon.png';
 import {
     FaCar,
@@ -20,6 +20,7 @@ import {
 import { HiUser } from 'react-icons/hi2';
 
 const Navbar = () => {
+    const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -135,6 +136,12 @@ const Navbar = () => {
         setMobileSubmenu(null);
     };
 
+    // Helper to check if link is active
+    const isActive = (href) => {
+        if (href === '/' && location.pathname !== '/') return false;
+        return location.pathname.startsWith(href);
+    };
+
     return (
         <>
             {/* Navbar with Tailwind Animations */}
@@ -187,15 +194,14 @@ const Navbar = () => {
                                         href={link.href}
                                         className="relative px-3 py-2 group block"
                                     >
-                                        <span className={`relative z-10 text-sm tracking-wide transition-all duration-300 ${activeDropdown === link.name
+                                        <span className={`relative z-10 text-sm tracking-wide transition-all duration-300 ${isActive(link.href) || activeDropdown === link.name
                                             ? 'text-[#1660C3]'
                                             : 'text-gray-700 group-hover:text-[#1660C3]'
                                             }`}>
                                             {link.name}
                                         </span>
 
-                                        {/* Elegant underline */}
-                                        <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-to-r from-[#1660C3] to-[#2671D8] transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${activeDropdown === link.name ? 'w-4/5' : 'w-0'
+                                        <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-to-r from-[#1660C3] to-[#2671D8] transform -translate-x-1/2 transition-all duration-300 group-hover:w-4/5 ${isActive(link.href) || activeDropdown === link.name ? 'w-4/5' : 'w-0'
                                             }`}></span>
                                     </a>
                                 </div>
@@ -305,13 +311,13 @@ const Navbar = () => {
                         )}
                     </div>
                 </div>
-            </nav>
+            </nav >
 
             {/* Mobile Drawer */}
-            <div className={`lg:hidden fixed inset-0 z-50 bg-white transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0 animate-slideInRight' : 'translate-x-full'
+            < div className={`lg:hidden fixed inset-0 z-50 bg-white transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0 animate-slideInRight' : 'translate-x-full'
                 }`}>
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between px-6 py-5 animate-fadeIn">
+                < div className="flex items-center justify-between px-6 py-5 animate-fadeIn" >
                     <a href="/" className="flex items-center gap-3 group">
                         <span className="text-2xl font-bold bg-gradient-to-r from-[#1660C3] to-[#2671D8] bg-clip-text text-transparent tracking-wide font-audiowide uppercase">
                             RIDEN
@@ -323,12 +329,12 @@ const Navbar = () => {
                     >
                         <FaTimes className="w-5 h-5 text-gray-600" />
                     </button>
-                </div>
+                </div >
 
                 {/* Drawer Content */}
-                <div className="h-[calc(100vh-80px)] overflow-y-auto relative">
+                < div className="h-[calc(100vh-80px)] overflow-y-auto relative" >
                     {/* Main Menu */}
-                    <div className={`absolute inset-0 transition-all duration-500 ${mobileSubmenu ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'
+                    < div className={`absolute inset-0 transition-all duration-500 ${mobileSubmenu ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'
                         }`}>
                         <div className="px-6 py-8">
                             {/* Mobile Navigation Links */}
@@ -353,7 +359,7 @@ const Navbar = () => {
                                         ) : (
                                             <a
                                                 href={link.href}
-                                                className="block px-4 py-4 text-gray-900 font-medium text-lg hover:bg-gray-50 rounded-xl transition-all duration-300 hover:translate-x-2"
+                                                className={`block px-4 py-4 font-medium text-lg hover:bg-gray-50 rounded-xl transition-all duration-300 hover:translate-x-2 ${isActive(link.href) ? 'text-[#1660C3] bg-blue-50' : 'text-gray-900'}`}
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 {link.name}
@@ -378,10 +384,10 @@ const Navbar = () => {
                                 </Link>
                             </div>
                         </div>
-                    </div>
+                    </div >
 
                     {/* Submenu */}
-                    <div className={`absolute inset-0 bg-white transition-all duration-500 ${mobileSubmenu ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+                    < div className={`absolute inset-0 bg-white transition-all duration-500 ${mobileSubmenu ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
                         }`}>
                         {mobileSubmenu && (
                             <div className="h-full overflow-y-auto">
@@ -432,12 +438,12 @@ const Navbar = () => {
                                 </div>
                             </div>
                         )}
-                    </div>
-                </div>
-            </div>
+                    </div >
+                </div >
+            </div >
 
             {/* Add custom Tailwind animations to your tailwind.config.js */}
-            <style jsx>{`
+            < style jsx > {`
                 @keyframes slideDownFadeIn {
                     from {
                         opacity: 0;
@@ -576,7 +582,7 @@ const Navbar = () => {
                 .animate-fadeIn {
                     animation: fadeInUp 0.4s ease-out forwards;
                 }
-            `}</style>
+            `}</style >
         </>
     );
 };
