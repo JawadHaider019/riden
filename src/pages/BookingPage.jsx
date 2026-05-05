@@ -275,38 +275,37 @@ const BookingPage = () => {
                 <div className="flex items-center gap-3 border-b border-zinc-200 pb-2">
                     <div className="w-5 h-5 rounded-full border-4 border-black flex-shrink-0" />
                     {isLoaded ? (
-                        <Autocomplete
-                            onLoad={setPickupAutocomplete}
-                            onPlaceChanged={() => {
-                                if (pickupAutocomplete) {
-                                    const place = pickupAutocomplete.getPlace();
-                                    if (place.geometry) {
-                                        setPickupCoords(place.geometry.location);
-                                        const addr = place.formatted_address || place.name;
-                                        setPickupLoc(addr);
-                                        lastValidPickup.current = addr;
-                                        pickupRef.current = { value: addr };
-                                        calculateRoute();
+                        <div className="flex-1">
+                            <Autocomplete
+                                onLoad={setPickupAutocomplete}
+                                onPlaceChanged={() => {
+                                    if (pickupAutocomplete) {
+                                        const place = pickupAutocomplete.getPlace();
+                                        if (place.geometry) {
+                                            const addr = place.formatted_address || place.name;
+                                            setPickupLoc(addr);
+                                            lastValidPickup.current = addr;
+                                            calculateRoute();
+                                        }
                                     }
-                                }
-                            }}>
-                            <input
-                                type="text"
-                                id="pickup-ac"
-                                placeholder="From"
-                                value={pickupLoc}
-                                title={pickupLoc}
-                                onChange={(e) => {
-                                    setPickupLoc(e.target.value);
-                                    pickupRef.current = { value: e.target.value };
-                                    lastValidPickup.current = e.target.value;
-                                    requestIdRef.current++;
-                                    setPickupCoords(null);
-                                    clearRouteFromMap();
-                                }}
-                                className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                            />
-                        </Autocomplete>
+                                }}>
+                                <input
+                                    type="text"
+                                    ref={pickupRef}
+                                    id="pickup-ac"
+                                    placeholder="From"
+                                    value={pickupLoc}
+                                    onChange={(e) => {
+                                        setPickupLoc(e.target.value);
+                                        lastValidPickup.current = e.target.value;
+                                        requestIdRef.current++;
+                                        setPickupCoords(null);
+                                        clearRouteFromMap();
+                                    }}
+                                    className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
+                                />
+                            </Autocomplete>
+                        </div>
                     ) : <input type="text" placeholder="From..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
 
@@ -316,30 +315,31 @@ const BookingPage = () => {
                             <div key={stop.id} className="flex items-center gap-3 border-b border-zinc-200 pb-2 relative">
                                 <div className="w-3 h-3 rounded-full border-4 border-zinc-400 flex-shrink-0" />
                                 {isLoaded ? (
-                                    <Autocomplete
-                                        onLoad={(auto) => stopAutocompletes.current[stop.id] = auto}
-                                        onPlaceChanged={() => {
-                                            const auto = stopAutocompletes.current[stop.id];
-                                            if (auto) {
-                                                const place = auto.getPlace();
-                                                if (place.geometry) {
-                                                    const addr = place.formatted_address || place.name;
-                                                    setStopsList(stopsList.map(s => s.id === stop.id ? { ...s, val: addr } : s));
-                                                    stopRefs.current[stop.id] = { value: addr };
-                                                    calculateRoute();
+                                    <div className="flex-1">
+                                        <Autocomplete
+                                            onLoad={(auto) => stopAutocompletes.current[stop.id] = auto}
+                                            onPlaceChanged={() => {
+                                                const auto = stopAutocompletes.current[stop.id];
+                                                if (auto) {
+                                                    const place = auto.getPlace();
+                                                    if (place.geometry) {
+                                                        const addr = place.formatted_address || place.name;
+                                                        setStopsList(stopsList.map(s => s.id === stop.id ? { ...s, val: addr } : s));
+                                                        calculateRoute();
+                                                    }
                                                 }
-                                            }
-                                        }}>
-                                        <input
-                                            type="text"
-                                            id={`stop-${stop.id}`}
-                                            placeholder="Stop Location"
-                                            value={stop.val}
-                                            title={stop.val}
-                                            onChange={(e) => handleStopChange(stop.id, e.target.value)}
-                                            className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                                        />
-                                    </Autocomplete>
+                                            }}>
+                                            <input
+                                                type="text"
+                                                ref={(el) => stopRefs.current[stop.id] = el}
+                                                id={`stop-${stop.id}`}
+                                                placeholder="Stop Location"
+                                                value={stop.val}
+                                                onChange={(e) => handleStopChange(stop.id, e.target.value)}
+                                                className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
+                                            />
+                                        </Autocomplete>
+                                    </div>
                                 ) : <input type="text" placeholder="Stop..." className="w-full bg-transparent outline-none text-sm" />}
                                 <button onClick={() => handleRemoveStop(stop.id)} className="text-red-400 absolute right-0 hover:text-red-600"><HiXMark /></button>
                             </div>
@@ -350,36 +350,37 @@ const BookingPage = () => {
                 <div className="flex items-center gap-3 border-b border-zinc-200 pb-2">
                     <div className="w-5 h-5 rounded-full border-4 border-[#1660C3] flex-shrink-0" />
                     {isLoaded ? (
-                        <Autocomplete
-                            onLoad={setDropoffAutocomplete}
-                            onPlaceChanged={() => {
-                                if (dropoffAutocomplete) {
-                                    const place = dropoffAutocomplete.getPlace();
-                                    if (place.geometry) {
-                                        setDropoffCoords(place.geometry.location);
-                                        setDropoffLoc(place.formatted_address || place.name);
-                                        dropoffRef.current = { value: place.formatted_address || place.name };
-                                        calculateRoute();
+                        <div className="flex-1">
+                            <Autocomplete
+                                onLoad={setDropoffAutocomplete}
+                                onPlaceChanged={() => {
+                                    if (dropoffAutocomplete) {
+                                        const place = dropoffAutocomplete.getPlace();
+                                        if (place.geometry) {
+                                            const addr = place.formatted_address || place.name;
+                                            setDropoffLoc(addr);
+                                            lastValidDropoff.current = addr;
+                                            calculateRoute();
+                                        }
                                     }
-                                }
-                            }}>
-                            <input
-                                type="text"
-                                id="dropoff-ac"
-                                placeholder="To"
-                                value={dropoffLoc}
-                                title={dropoffLoc}
-                                onChange={(e) => {
-                                    setDropoffLoc(e.target.value);
-                                    dropoffRef.current = { value: e.target.value };
-                                    lastValidDropoff.current = e.target.value;
-                                    requestIdRef.current++;
-                                    setDropoffCoords(null);
-                                    clearRouteFromMap();
-                                }}
-                                className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                            />
-                        </Autocomplete>
+                                }}>
+                                <input
+                                    type="text"
+                                    ref={dropoffRef}
+                                    id="dropoff-ac"
+                                    placeholder="To"
+                                    value={dropoffLoc}
+                                    onChange={(e) => {
+                                        setDropoffLoc(e.target.value);
+                                        lastValidDropoff.current = e.target.value;
+                                        requestIdRef.current++;
+                                        setDropoffCoords(null);
+                                        clearRouteFromMap();
+                                    }}
+                                    className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
+                                />
+                            </Autocomplete>
+                        </div>
                     ) : <input type="text" placeholder="To..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
 
