@@ -219,8 +219,12 @@ const BookingPage = () => {
                     <span className="font-bold text-sm text-zinc-700">{durationMin.toFixed(0)} min</span>
                     <div className="w-px h-4 bg-zinc-300" />
                     <div>
-                        <span className="font-bold text-sm text-[#1660C3]">C$ {(PRICING.baseFare + distanceKm * PRICING.ratePerKm + durationMin * PRICING.ratePerMin).toFixed(2)}</span>
-                        <span className="text-[10px] text-zinc-400 ml-1">base</span>
+                        <span className="font-bold text-sm text-[#1660C3]">
+                            {selectedCar
+                                ? selectedCar.price
+                                : carOptions[serviceClass][0].price}
+                        </span>
+                        {!selectedCar && <span className="text-[10px] text-zinc-400 ml-1">from</span>}
                     </div>
                 </div>
             )}
