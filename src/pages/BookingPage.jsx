@@ -208,9 +208,23 @@ const BookingPage = () => {
             </div>
 
             {distanceKm > 0 && (
-                <div className="flex justify-between text-sm bg-blue-50 p-3 rounded-lg text-blue-900 font-bold dm-sans">
-                    <span>{distanceKm.toFixed(1)} km</span>
-                    <span>{durationMin.toFixed(0)} min</span>
+                <div className="rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4">
+                    <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2">Route Summary</p>
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white rounded-lg p-2 shadow-sm">
+                                <HiMapPin className="text-[#1660C3] text-base" />
+                            </div>
+                            <div>
+                                <p className="font-bold text-zinc-900 text-sm">{distanceKm.toFixed(1)} km</p>
+                                <p className="text-[10px] text-zinc-400">{durationMin.toFixed(0)} min drive</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] text-zinc-400">From</p>
+                            <p className="font-bold text-[#1660C3] text-sm">C$ {(PRICING.baseFare + distanceKm * PRICING.ratePerKm + durationMin * PRICING.ratePerMin).toFixed(2)}</p>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -242,12 +256,7 @@ const BookingPage = () => {
                 </div>
             </div>
 
-            <div className="mt-4 space-y-4">
-                <textarea
-                    placeholder="Driver Instruction"
-                    className="w-full bg-zinc-100/50 border border-transparent rounded-xl p-4 outline-none text-sm dm-sans h-24 resize-none focus:bg-white focus:border-zinc-200 transition-all"
-                />
-
+            <div className="mt-4 space-y-3">
                 <button
                     onClick={() => setStep('for_whom')}
                     className="w-full flex items-center justify-between bg-zinc-100/50 p-4 rounded-xl hover:bg-zinc-100 transition-colors"
@@ -261,7 +270,7 @@ const BookingPage = () => {
                         if (!isLogin) setStep('phone');
                         else setSidebarStep('selection');
                     }}
-                    className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity mt-2"
+                    className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity"
                 >
                     {isLogin ? 'Continue' : 'Log in To continue'}
                 </button>
@@ -345,12 +354,19 @@ const BookingPage = () => {
                     ))}
                 </div>
 
-                <div className="space-y-4">
-                    <textarea
-                        placeholder="Driver Instruction"
-                        className="w-full bg-zinc-100 border-none rounded-2xl p-4 outline-none text-sm dm-sans h-32 resize-none"
-                    />
-
+                <div className="space-y-3">
+                    {distanceKm > 0 && selectedCar && (
+                        <div className="flex justify-between items-center bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                            <div>
+                                <h4 className="font-bold text-zinc-900 text-sm">Ride Summary</h4>
+                                <p className="text-xs text-zinc-500 mt-0.5">{distanceKm.toFixed(1)} km &bull; {durationMin.toFixed(0)} min</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[10px] text-zinc-400 font-semibold uppercase">Fare</p>
+                                <p className="font-bold text-[#1660C3] text-lg">{selectedCar.price}</p>
+                            </div>
+                        </div>
+                    )}
                     <button
                         onClick={() => setStep('for_whom')}
                         className="w-full flex items-center justify-between bg-zinc-100/50 p-4 rounded-xl hover:bg-zinc-100 transition-colors"
@@ -788,6 +804,31 @@ const BookingPage = () => {
 
     return (
         <div className="relative h-[calc(100vh-72px)] lg:h-[calc(100vh-84px)] w-full bg-zinc-100 overflow-hidden mt-[72px] lg:mt-[84px]">
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .pac-container {
+                    width: 380px !important;
+                    max-width: 90vw !important;
+                    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 8px 16px -6px rgba(0, 0, 0, 0.08);
+                    border-radius: 0.875rem;
+                    border: 1px solid #e4e4e7;
+                    font-family: 'DM Sans', sans-serif;
+                    margin-top: 6px;
+                    overflow: hidden;
+                    z-index: 9999 !important;
+                }
+                .pac-item {
+                    padding: 10px 14px;
+                    font-size: 13px;
+                    cursor: pointer;
+                    border-top: 1px solid #f4f4f5;
+                }
+                .pac-item:first-child { border-top: none; }
+                .pac-item:hover { background-color: #eff6ff; }
+                .pac-item-query { font-weight: 600; color: #0E0E0E; }
+                .pac-matched { color: #1660C3; }
+                .pac-icon { display: none; }
+            `}} />
             {/* Real Map (Google Maps Embed) */}
             <div className="absolute inset-0 z-0 bg-zinc-900">
                 {isLoaded ? (
