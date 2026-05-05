@@ -96,7 +96,19 @@ const BookingPage = () => {
     };
 
     const calculateRoute = async () => {
-        if (!pickupRef.current || !dropoffRef.current || !window.google) return;
+        const pickupVal = pickupRef.current?.value || pickupLoc;
+        const dropoffVal = dropoffRef.current?.value || dropoffLoc;
+
+        if (!pickupVal || !dropoffVal || !window.google) {
+            if (!dropoffVal) {
+                setDirectionsResponse(null);
+                setRoutePath([]);
+                setDropoffCoords(null);
+                setDistanceKm(0);
+                setDurationMin(0);
+            }
+            return;
+        }
 
         try {
             const directionsService = new window.google.maps.DirectionsService();
@@ -106,8 +118,8 @@ const BookingPage = () => {
             }));
 
             const results = await directionsService.route({
-                origin: pickupRef.current.value,
-                destination: dropoffRef.current.value,
+                origin: pickupVal,
+                destination: dropoffVal,
                 waypoints: waypoints,
                 travelMode: window.google.maps.TravelMode.DRIVING,
             });
@@ -115,6 +127,10 @@ const BookingPage = () => {
             setDirectionsResponse(results);
             const route = results.routes[0];
             setRoutePath(route.overview_path);
+
+            // SYNC COORDINATES WITH ROUTE FOR PERFECT ACCURACY
+            setPickupCoords(route.legs[0].start_location);
+            setDropoffCoords(route.legs[route.legs.length - 1].end_location);
 
             let totalDist = 0;
             let totalDur = 0;
@@ -209,7 +225,21 @@ const BookingPage = () => {
                                     }
                                 }
                             }}>
-                            <input type="text" id="pickup-ac" placeholder="From" defaultValue={pickupLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                            <input
+                                type="text"
+                                id="pickup-ac"
+                                placeholder="From"
+                                defaultValue={pickupLoc}
+                                onChange={(e) => {
+                                    if (!e.target.value) {
+                                        setPickupCoords(null);
+                                        setPickupLoc('');
+                                        pickupRef.current = { value: '' };
+                                        calculateRoute();
+                                    }
+                                }}
+                                className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
+                            />
                         </Autocomplete>
                     ) : <input type="text" placeholder="From..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
@@ -257,7 +287,20 @@ const BookingPage = () => {
                                     }
                                 }
                             }}>
-                            <input type="text" id="dropoff-ac" placeholder="To" defaultValue={dropoffLoc} className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm" />
+                            <input
+                                type="text"
+                                id="dropoff-ac"
+                                placeholder="To"
+                                defaultValue={dropoffLoc}
+                                onChange={(e) => {
+                                    if (!e.target.value) {
+                                        setDropoffLoc('');
+                                        dropoffRef.current = { value: '' };
+                                        calculateRoute();
+                                    }
+                                }}
+                                className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
+                            />
                         </Autocomplete>
                     ) : <input type="text" placeholder="To..." className="w-full bg-transparent outline-none text-sm" />}
                 </div>
