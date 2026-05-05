@@ -21,7 +21,7 @@ import {
     FaApple
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useJsApiLoader, GoogleMap, Autocomplete, Polyline, Marker } from '@react-google-maps/api';
+import { useJsApiLoader, GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
 
 // Imports and constants moved around
 
@@ -91,6 +91,34 @@ const BookingPage = () => {
     const lastValidPickup = React.useRef('');
     const lastValidDropoff = React.useRef('');
 
+    // Imperative polyline refs for guaranteed map cleanup
+    const polylineRefs = React.useRef([]);
+
+    const clearRouteFromMap = React.useCallback(() => {
+        polylineRefs.current.forEach(pl => { if (pl) pl.setMap(null); });
+        polylineRefs.current = [];
+        setDirectionsResponse(null);
+        setRoutePath([]);
+        setDistanceKm(0);
+        setDurationMin(0);
+    }, []);
+
+    const drawPolylineOnMap = React.useCallback((mapInstance, path) => {
+        // Clear any existing polylines first
+        polylineRefs.current.forEach(pl => { if (pl) pl.setMap(null); });
+        polylineRefs.current = [];
+
+        const configs = [
+            { strokeColor: '#93c5fd', strokeWeight: 10, strokeOpacity: 0.25 },
+            { strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.6 },
+            { strokeColor: '#ffffff', strokeWeight: 2.5, strokeOpacity: 0.9 },
+        ];
+        configs.forEach(opts => {
+            const pl = new window.google.maps.Polyline({ path, ...opts, map: mapInstance });
+            polylineRefs.current.push(pl);
+        });
+    }, []);
+
     const handleAddStop = () => {
         setStopsList([...stopsList, { id: Date.now(), val: '' }]);
     };
@@ -106,10 +134,7 @@ const BookingPage = () => {
         const dropoffVal = dropoffRef.current?.value || lastValidDropoff.current;
 
         if (!pickupVal || !dropoffVal || !window.google) {
-            setDirectionsResponse(null);
-            setRoutePath([]);
-            setDistanceKm(0);
-            setDurationMin(0);
+            clearRouteFromMap();
             if (!dropoffVal) setDropoffCoords(null);
             if (!pickupVal) setPickupCoords(null);
             return;
@@ -130,11 +155,16 @@ const BookingPage = () => {
             });
 
             // If a newer request was started or input cleared, discard this one
-            if (id !== requestIdRef.current || !pickupRef.current?.value || !dropoffRef.current?.value) return;
+            if (id !== requestIdRef.current || !pickupRef.current?.value || !dropoffRef.current?.value) {
+                return;
+            }
 
             setDirectionsResponse(results);
             const route = results.routes[0];
-            setRoutePath([...route.overview_path]); // New reference
+            setRoutePath([...route.overview_path]);
+
+            // Draw imperatively on the map instance
+            if (map) drawPolylineOnMap(map, route.overview_path);
 
             setPickupCoords(route.legs[0].start_location);
             setDropoffCoords(route.legs[route.legs.length - 1].end_location);
@@ -151,10 +181,7 @@ const BookingPage = () => {
         } catch (error) {
             if (id === requestIdRef.current) {
                 console.error("Calculate route error", error);
-                setDirectionsResponse(null);
-                setRoutePath([]);
-                setDistanceKm(0);
-                setDurationMin(0);
+                clearRouteFromMap();
             }
         }
     };
@@ -245,13 +272,9 @@ const BookingPage = () => {
                                     setPickupLoc(e.target.value);
                                     pickupRef.current = { value: e.target.value };
                                     lastValidPickup.current = e.target.value;
-                                    // Clear marker and path immediately 
-                                    requestIdRef.current++; // Invalidate pending requests
+                                    requestIdRef.current++;
                                     setPickupCoords(null);
-                                    setDirectionsResponse(null);
-                                    setRoutePath([]);
-                                    setDistanceKm(0);
-                                    setDurationMin(0);
+                                    clearRouteFromMap();
                                 }}
                                 className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
                             />
@@ -311,13 +334,9 @@ const BookingPage = () => {
                                     setDropoffLoc(e.target.value);
                                     dropoffRef.current = { value: e.target.value };
                                     lastValidDropoff.current = e.target.value;
-                                    // Clear marker and path immediately 
-                                    requestIdRef.current++; // Invalidate pending requests
+                                    requestIdRef.current++;
                                     setDropoffCoords(null);
-                                    setDirectionsResponse(null);
-                                    setRoutePath([]);
-                                    setDistanceKm(0);
-                                    setDurationMin(0);
+                                    clearRouteFromMap();
                                 }}
                                 className="w-full bg-transparent outline-none text-[#0E0E0E] font-medium dm-sans text-sm"
                             />
@@ -899,21 +918,7 @@ const BookingPage = () => {
                         {/* NEW: Explicitly check for both response and path to avoid ghosting */}
                         {(directionsResponse && routePath && routePath.length > 0) ? (
                             <React.Fragment key={`route-${requestIdRef.current}`}>
-                                {/* Glowing Route Layers */}
-                                <Polyline
-                                    path={routePath}
-                                    options={{ strokeColor: '#b2cfffff', strokeWeight: 6, strokeOpacity: 0.5, zIndex: 1 }}
-                                />
-                                <Polyline
-                                    path={routePath}
-                                    options={{ strokeColor: '#60a5fa', strokeWeight: 5, strokeOpacity: 0.5, zIndex: 2 }}
-                                />
-                                <Polyline
-                                    path={routePath}
-                                    options={{ strokeColor: '#ffffff', strokeWeight: 3, strokeOpacity: 0.8, zIndex: 3 }}
-                                />
-
-                                {/* Stop Markers */}
+                                {/* Polylines are drawn imperatively; only render stop markers here */}
                                 {(() => {
                                     const route = directionsResponse.routes[0];
                                     const legs = route.legs;
