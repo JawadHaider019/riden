@@ -123,7 +123,7 @@ const HowItWorks = () => {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fadeInLeft {
                     from {
                         opacity: 0;

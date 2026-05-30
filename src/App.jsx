@@ -9,9 +9,12 @@ import BookingPage from './pages/BookingPage';
 import ProfilePage from './pages/ProfilePage';
 
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <div className="App">
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/contact" element={<Contact />} />

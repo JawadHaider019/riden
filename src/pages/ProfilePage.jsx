@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
+import { clearAuth, getToken, getPassengerProfile, updatePassengerProfile, getUser, saveAuth, logoutPassenger } from '../api/authApi';
 import {
     FaUser,
     FaCreditCard,
@@ -16,9 +19,58 @@ import {
 
 const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState('ACCOUNT');
-    const [view, setView] = useState('list'); // 'list' or 'detail' (for tickets) or 'add' (for cards)
+    const [view, setView] = useState('list');
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    const [profile, setProfile] = useState(getUser() || {});
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!getToken()) {
+            navigate('/booking');
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await getPassengerProfile();
+                const userData = res.data?.user || res.data || res.user || res;
+                if (userData) {
+                    setProfile(userData);
+                    saveAuth(getToken(), userData); // Sync local storage
+                }
+            } catch (err) {
+                console.error('Failed to fetch profile', err);
+            }
+        };
+        if (getToken()) fetchProfile();
+    }, []);
+
+    const handleLogout = async () => {
+        await logoutPassenger();
+        navigate('/');
+    };
+
+    const handleUpdateProfile = async (formData) => {
+        setLoading(true);
+        try {
+            const res = await updatePassengerProfile(formData);
+            const userData = res.data?.user || res.data || res.user || res;
+            if (userData) {
+                setProfile(userData);
+                saveAuth(getToken(), userData);
+                toast.success('Profile updated successfully!');
+            }
+        } catch (err) {
+            const errorData = err.response?.data || err;
+            const msg = errorData.message || Object.values(errorData.errors || {})?.[0]?.[0] || 'Failed to update profile';
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const tabs = [
         { id: 'ACCOUNT', label: 'ACCOUNT', icon: FaUser },
@@ -31,7 +83,7 @@ const ProfilePage = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'ACCOUNT':
-                return <AccountSettings />;
+                return <AccountSettings profile={profile} onUpdate={handleUpdateProfile} loading={loading} />;
             case 'PAYMENT METHODS':
                 if (view === 'add') return <AddCard onBack={() => setView('list')} />;
                 return <PaymentMethods onAddCard={() => setView('add')} />;
@@ -63,7 +115,10 @@ const ProfilePage = () => {
                         <p className="text-gray-500 mb-8 leading-relaxed">You'll need to log in again to access your account.</p>
 
                         <div className="w-full space-y-4">
-                            <button className="w-full py-4 bg-[#1660C3] text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full py-4 bg-[#1660C3] text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                            >
                                 Log Out
                             </button>
                             <button
@@ -90,7 +145,9 @@ const ProfilePage = () => {
                                     <FaCamera className="text-white" />
                                 </div>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-800 tracking-wider">HARIS MEHMOOD</h2>
+                            <h2 className="text-xl font-bold text-gray-800 tracking-wider">
+                                {profile.name || `${profile.first_name || 'GUEST'} ${profile.last_name || ''}`}
+                            </h2>
                         </div>
 
                         <nav className="p-4 space-y-1">
@@ -128,7 +185,7 @@ const ProfilePage = () => {
 
             <Footer />
 
-            <style jsx>{`
+            <style>{`
                 .font-audiowide { font-family: 'Audiowide', sans-serif; }
                 .font-dm-sans { font-family: 'DM Sans', sans-serif; }
                 
@@ -162,72 +219,114 @@ const ProfilePage = () => {
 };
 
 // Sub-components
-const AccountSettings = () => (
-    <div className="space-y-8">
-        <h3 className="text-2xl font-bold text-[#1660C3] mb-6 font-audiowide uppercase tracking-wide">Account Settings</h3>
+const AccountSettings = ({ profile, onUpdate, loading }) => {
+    const [formData, setFormData] = useState({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        password: ''
+    });
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 ml-1">First Name</label>
-                <input
-                    type="text"
-                    defaultValue="Sara"
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
-                    placeholder="Enter first name"
-                />
-            </div>
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 ml-1">Last Name</label>
-                <input
-                    type="text"
-                    defaultValue="Mitchell"
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
-                    placeholder="Enter last name"
-                />
-            </div>
-        </div>
+    useEffect(() => {
+        let fn = profile.first_name || '';
+        let ln = profile.last_name || '';
+        if (!fn && profile.name) {
+            const parts = profile.name.split(' ');
+            fn = parts[0];
+            ln = parts.slice(1).join(' ');
+        }
+        setFormData({
+            first_name: fn,
+            last_name: ln,
+            email: profile.email || '',
+            phone: profile.phone || '',
+            password: ''
+        });
+    }, [profile]);
 
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
-            <input
-                type="email"
-                defaultValue="yourgmail@gmail.com"
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
-                placeholder="Enter email address"
-            />
-        </div>
+    const handleSubmit = () => {
+        const updateData = { ...formData };
+        if (!updateData.password) delete updateData.password;
+        onUpdate(updateData);
+    };
 
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 ml-1">Phone Number</label>
-            <div className="flex gap-2">
-                <div className="flex items-center gap-2 px-3 py-3 bg-white border border-gray-200 rounded-xl min-w-[100px]">
-                    <span className="text-xl">🇨🇦</span>
-                    <FaChevronRight className="rotate-90 text-[10px] text-gray-400" />
+    return (
+        <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-[#1660C3] mb-6 font-audiowide uppercase tracking-wide">Account Settings</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1">First Name</label>
+                    <input
+                        type="text"
+                        value={formData.first_name}
+                        onChange={e => setFormData({ ...formData, first_name: e.target.value })}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
+                        placeholder="Enter first name"
+                    />
                 </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1">Last Name</label>
+                    <input
+                        type="text"
+                        value={formData.last_name}
+                        onChange={e => setFormData({ ...formData, last_name: e.target.value })}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
+                        placeholder="Enter last name"
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
                 <input
-                    type="tel"
-                    defaultValue="+1 217 7895412"
-                    className="flex-grow px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
-                    placeholder="Enter phone number"
+                    type="email"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
+                    placeholder="Enter email address"
                 />
             </div>
-        </div>
 
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 ml-1">Password</label>
-            <input
-                type="password"
-                defaultValue="************"
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
-                placeholder="Enter password"
-            />
-        </div>
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 ml-1">Phone Number</label>
+                <div className="flex gap-2">
+                    <div className="flex items-center gap-2 px-3 py-3 bg-white border border-gray-200 rounded-xl min-w-[100px]">
+                        <span className="text-xl">📞</span>
+                        <FaChevronRight className="rotate-90 text-[10px] text-gray-400" />
+                    </div>
+                    <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                        className="flex-grow px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
+                        placeholder="Enter phone number"
+                    />
+                </div>
+            </div>
 
-        <button className="w-full py-4 bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white rounded-xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-200 mt-4 uppercase tracking-widest font-audiowide">
-            Save Changes
-        </button>
-    </div>
-);
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 ml-1">Password (Leave blank to keep current)</label>
+                <input
+                    type="password"
+                    value={formData.password}
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1660C3] focus:border-transparent transition-all outline-none"
+                    placeholder="Enter new password"
+                />
+            </div>
+
+            <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full py-4 bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white rounded-xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-200 mt-4 uppercase tracking-widest font-audiowide disabled:opacity-50"
+            >
+                {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+        </div>
+    );
+};
 
 const PaymentMethods = ({ onAddCard }) => (
     <div className="space-y-8">
@@ -583,7 +682,7 @@ const TermsAndConditions = () => (
             </section>
         </div>
 
-        <style jsx>{`
+        <style>{`
             .custom-scrollbar::-webkit-scrollbar { width: 6px; }
             .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
             .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }

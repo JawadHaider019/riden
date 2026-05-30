@@ -132,7 +132,7 @@ const FAQ = () => {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes slideInRight {
                     from {
                         opacity: 0;

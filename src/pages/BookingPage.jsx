@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { getToken } from '../api/authApi';
+import { createBooking, cancelBooking, getVehicleTypes, getBookingDetail, getOngoingBookings } from '../api/bookingApi';
+import AuthModal from '../components/AuthModal';
 import {
     HiMapPin,
     HiPlusCircle,
@@ -54,6 +58,53 @@ const darkGlowStyle = [
     { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
     { elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
     { elementType: "labels.text.stroke", stylers: [{ color: "#0d1117" }] },
+];
+
+const formatEstimatedTime = (timeStr) => {
+    if (!timeStr) return '5';
+    if (typeof timeStr === 'number') return Math.ceil(timeStr / 60);
+    const parts = timeStr.split(':');
+    if (parts.length === 3) {
+        const h = parseInt(parts[0]);
+        const m = parseInt(parts[1]);
+        const total = (h * 60) + m;
+        return total > 0 ? total : (parseInt(parts[2]) > 0 ? '1' : '0');
+    }
+    return timeStr;
+};
+
+const getCoordValue = (coord, type) => {
+    if (!coord) return null;
+    // Handle Google Maps LatLng object
+    if (typeof coord[type] === 'function') return coord[type]();
+    // Handle plain object {lat: 1, lng: 2}
+    return coord[type];
+};
+
+const reverseGeocode = async (lat, lng) => {
+    if (!window.google?.maps?.Geocoder) return null;
+    const geocoder = new window.google.maps.Geocoder();
+    try {
+        const response = await geocoder.geocode({
+            location: { lat: parseFloat(lat), lng: parseFloat(lng) },
+            language: 'en'
+        });
+        if (response.results) {
+            // Filter out Plus Codes and try to find a real address
+            const streetResult = response.results.find(res =>
+                !res.types.includes('plus_code') &&
+                !res.formatted_address.includes('+')
+            );
+            return streetResult ? streetResult.formatted_address : response.results[0].formatted_address;
+        }
+    } catch (err) {
+        console.error('Geocoding failed', err);
+    }
+    return null;
+};
+
+const darkGlowStyleFull = [
+    ...darkGlowStyle,
     { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
     { featureType: "poi", elementType: "geometry", stylers: [{ color: "#161b22" }] },
     { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
@@ -82,15 +133,126 @@ const BookingPage = () => {
         libraries: libraries
     });
 
-    const [sidebarStep, setSidebarStep] = useState('details'); // details, selection, request, searching, arriving
+    const [sidebarStep, setSidebarStep] = useState('details');
     const [selectedCar, setSelectedCar] = useState(CAR_OPTIONS_DATA[0]);
-    const [isLogin] = useState(false); // Toggle to test 'LOG IN TO CONTINUE'
+    const [isLoggedIn, setIsLoggedIn] = useState(!!getToken());
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-    const [step, setStep] = useState('booking'); // for modals: booking, for_whom, phone, otp
+    const [step, setStep] = useState('booking');
+
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [authInitialStep, setAuthInitialStep] = useState('phone');
+
 
     const [map, setMap] = useState(null);
     const [directionsResponse, setDirectionsResponse] = useState(null);
     const [routePath, setRoutePath] = useState([]);
+    const [currentBooking, setCurrentBooking] = useState(null);
+    const [bookingLoading, setBookingLoading] = useState(false);
+    const [backendVehicleTypes, setBackendVehicleTypes] = useState([]);
+
+    React.useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const res = await getVehicleTypes();
+                const types = res.vehicleTypes || res.data || res;
+                console.log('BACKEND VEHICLE TYPES:', types);
+                if (Array.isArray(types)) {
+                    setBackendVehicleTypes(types);
+                } else if (types && typeof types === 'object' && Array.isArray(types.vehicleTypes)) {
+                    setBackendVehicleTypes(types.vehicleTypes);
+                }
+            } catch (err) {
+                console.error('Failed to fetch vehicle types', err);
+            }
+        };
+        fetchTypes();
+    }, []);
+
+    React.useEffect(() => {
+        const fetchOngoing = async () => {
+            if (!getToken()) return;
+            try {
+                const res = await getOngoingBookings();
+                // Check if there is an ongoing booking in the response
+                const booking = res.booking || res.data || (Array.isArray(res) ? res[0] : (res.bookings ? res.bookings[0] : null));
+
+                if (booking && booking.id) {
+                    console.log('RESUMING ONGOING BOOKING:', booking);
+                    setCurrentBooking(booking);
+
+                    // Set immediate loading state while geocoding
+                    setPickupLoc(booking.pickup_address || 'Loading...');
+                    setDropoffLoc(booking.dropoff_address || 'Loading...');
+
+                    // Reverse geocode in background
+                    if (isLoaded) {
+                        if (!booking.pickup_address) {
+                            reverseGeocode(booking.pickup_lat, booking.pickup_lng).then(addr => {
+                                if (addr) setPickupLoc(addr);
+                            });
+                        }
+                        if (!booking.dropoff_address) {
+                            reverseGeocode(booking.dropoff_lat, booking.dropoff_lng).then(addr => {
+                                if (addr) setDropoffLoc(addr);
+                            });
+                        }
+                    }
+
+                    const pCoords = {
+                        lat: parseFloat(booking.pickup_lat),
+                        lng: parseFloat(booking.pickup_lng)
+                    };
+                    const dCoords = {
+                        lat: parseFloat(booking.dropoff_lat),
+                        lng: parseFloat(booking.dropoff_lng)
+                    };
+
+                    setPickupCoords(pCoords);
+                    setDropoffCoords(dCoords);
+
+                    // Center map on pickup
+                    if (map) {
+                        map.panTo(pCoords);
+                        map.setZoom(15);
+                    }
+
+                    if (booking.status === 'requested') {
+                        setSidebarStep('searching');
+                    } else {
+                        setSidebarStep('arriving'); // accepted, ongoing, etc.
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch ongoing booking', err);
+            }
+        };
+        fetchOngoing();
+    }, [isLoaded, map]);
+
+    React.useEffect(() => {
+        let interval;
+        if (currentBooking && (currentBooking.id || currentBooking.booking_id) && sidebarStep === 'searching') {
+            const bookingId = currentBooking.id || currentBooking.booking_id;
+            interval = setInterval(async () => {
+                try {
+                    const res = await getBookingDetail(bookingId);
+                    const booking = res.booking || res.data || res;
+                    console.log('POLLING RESULT:', booking);
+
+                    // Strictly transition only if status is definitely NOT 'requested'
+                    if (booking && booking.status === 'accepted') {
+                        console.log('RIDE ACCEPTED! Transitioning to Arriving screen');
+                        setCurrentBooking(booking);
+                        setSidebarStep('arriving');
+                        clearInterval(interval);
+                    }
+                } catch (err) {
+                    console.error('Polling error', err);
+                }
+            }, 5000); // Poll every 5 seconds
+        }
+        return () => clearInterval(interval);
+    }, [currentBooking, sidebarStep]);
 
     const [pickupLoc, setPickupLoc] = useState('');
     const [dropoffLoc, setDropoffLoc] = useState('');
@@ -226,6 +388,28 @@ const BookingPage = () => {
     }, [pickupCoords, map, directionsResponse]);
 
     React.useEffect(() => {
+        const autoCalculateResumed = async () => {
+            if (isLoaded && pickupCoords && dropoffCoords && !directionsResponse) {
+                try {
+                    const directionsService = new window.google.maps.DirectionsService();
+                    const results = await directionsService.route({
+                        origin: pickupCoords,
+                        destination: dropoffCoords,
+                        travelMode: window.google.maps.TravelMode.DRIVING,
+                    });
+                    setDirectionsResponse(results);
+                    const route = results.routes[0];
+                    setRoutePath([...route.overview_path]);
+                    if (map) drawPolylineOnMap(map, route.overview_path);
+                } catch (err) {
+                    console.error('Auto route calculation failed', err);
+                }
+            }
+        };
+        autoCalculateResumed();
+    }, [isLoaded, pickupCoords, dropoffCoords, directionsResponse, map]);
+
+    React.useEffect(() => {
         if (map && directionsResponse) {
             const bounds = new window.google.maps.LatLngBounds();
             directionsResponse.routes[0].overview_path.forEach(point => bounds.extend(point));
@@ -234,16 +418,17 @@ const BookingPage = () => {
     }, [directionsResponse, map]);
 
 
-    const getCalculatedPriceStr = (carId) => {
-        if (distanceKm === 0) return 'C$ 0.00';
-
+    const getCalculatedPrice = (carId) => {
+        if (distanceKm === 0) return 0;
         const multiplier = VEHICLE_MULTIPLIERS[carId] || 1.0;
-
         const distCost = distanceKm * PRICING.ratePerKm * multiplier;
         const timeCost = durationMin * PRICING.ratePerMin;
         const stopsCost = stopsList.length * PRICING.stopFee;
-        const total = PRICING.baseFare + distCost + timeCost + stopsCost;
+        return PRICING.baseFare + distCost + timeCost + stopsCost;
+    };
 
+    const getCalculatedPriceStr = (carId) => {
+        const total = getCalculatedPrice(carId);
         return `C$ ${total.toFixed(2)}`;
     };
 
@@ -252,11 +437,20 @@ const BookingPage = () => {
         return (PRICING.ratePerKm * multiplier).toFixed(2);
     };
 
-    const carOptions = CAR_OPTIONS_DATA.map(car => ({
-        ...car,
-        price: getCalculatedPriceStr(car.id),
-        baseRate: getBaseRatePerKm(car.id)
-    }));
+    const carOptions = CAR_OPTIONS_DATA.map(car => {
+        const backendType = backendVehicleTypes.find(t => t.id === car.id);
+        const imageHost = "https://api.itimium.com.pk/storage/";
+
+        return {
+            ...car,
+            name: backendType?.category || car.name,
+            // Construct the full storage URL for the vehicle image
+            image: backendType?.image_path ? `${imageHost}${backendType.image_path}` : car.image,
+            capacity: backendType?.capacity || car.capacity,
+            price: getCalculatedPriceStr(car.id),
+            baseRate: getBaseRatePerKm(car.id)
+        };
+    });
 
     const renderRideDetails = () => (
         <div className="flex flex-col gap-5 pb-8">
@@ -439,12 +633,15 @@ const BookingPage = () => {
                 <button
                     disabled={!selectedCar}
                     onClick={() => {
-                        if (!isLogin) setStep('phone');
+                        if (!isLoggedIn) {
+                            setAuthInitialStep('login');
+                            setIsAuthModalOpen(true);
+                        }
                         else setSidebarStep('request');
                     }}
                     className={`w-full text-white py-4 rounded-xl font-bold dm-sans uppercase tracking-[1px] shadow-lg transition-all ${selectedCar ? 'bg-gradient-to-r from-[#1660C3] to-[#2671D8] shadow-blue-200/50 hover:opacity-90' : 'bg-zinc-300 shadow-none cursor-not-allowed'}`}
                 >
-                    {isLogin ? 'Continue' : 'Log in To continue'}
+                    {isLoggedIn ? 'Continue' : 'Log in To continue'}
                 </button>
             </div>
         </div >
@@ -508,13 +705,44 @@ const BookingPage = () => {
                 </div>
 
                 <button
-                    onClick={() => {
-                        setSidebarStep('searching');
-                        setTimeout(() => setSidebarStep('arriving'), 3000); // Simulate search
+                    disabled={bookingLoading || !pickupCoords || !dropoffCoords}
+                    onClick={async () => {
+                        setBookingLoading(true);
+                        try {
+                            const data = {
+                                pickup_address: pickupLoc,
+                                dropoff_address: dropoffLoc,
+                                pickup_lat: getCoordValue(pickupCoords, 'lat'),
+                                pickup_lng: getCoordValue(pickupCoords, 'lng'),
+                                dropoff_lat: getCoordValue(dropoffCoords, 'lat'),
+                                dropoff_lng: getCoordValue(dropoffCoords, 'lng'),
+                                vehicle_type_id: selectedCar?.id,
+                                req_veh_type_id: selectedCar?.id,
+                                fare: getCalculatedPrice(selectedCar?.id),
+                                estimated_distance: distanceKm,
+                                estimated_time: Math.round(durationMin * 60),
+                                status: 'requested',
+                                payment_method: 'cash' // Default
+                            };
+                            const res = await createBooking(data);
+                            setCurrentBooking(res.data || res.booking || res);
+                            setSidebarStep('searching');
+                        } catch (err) {
+                            const errorData = err.response?.data || err;
+                            console.error('BOOKING ERROR:', JSON.stringify(errorData, null, 2));
+                            const msg = errorData.message || (errorData.errors ? Object.values(errorData.errors)[0][0] : null) || 'Failed to create booking. Please check your connection.';
+                            toast.error(msg);
+                            if (err.response?.status === 401) {
+                                setIsLoggedIn(false);
+                                setSidebarStep('details');
+                            }
+                        } finally {
+                            setBookingLoading(false);
+                        }
                     }}
-                    className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-5 rounded-2xl font-bold audiowide-regular uppercase tracking-[2px] shadow-xl shadow-blue-200/50 hover:opacity-95 transition-all mt-8"
+                    className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-5 rounded-2xl font-bold audiowide-regular uppercase tracking-[2px] shadow-xl shadow-blue-200/50 hover:opacity-95 transition-all mt-8 disabled:opacity-50"
                 >
-                    Request Ride
+                    {bookingLoading ? 'Requesting...' : 'Request Ride'}
                 </button>
             </div>
         </div>
@@ -542,100 +770,195 @@ const BookingPage = () => {
             </div>
 
             <button
-                onClick={() => setSidebarStep('request')}
-                className="bg-zinc-100/80 text-[#1660C3] px-12 py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors"
+                disabled={bookingLoading}
+                onClick={async () => {
+                    const bookingId = currentBooking?.id;
+                    if (!bookingId) {
+                        setSidebarStep('request');
+                        return;
+                    }
+                    setBookingLoading(true);
+                    try {
+                        await cancelBooking(bookingId);
+                        setCurrentBooking(null);
+                        setSidebarStep('request');
+                    } catch (err) {
+                        console.error('Cancellation failed', err);
+                        setSidebarStep('request');
+                    } finally {
+                        setBookingLoading(false);
+                    }
+                }}
+                className="bg-zinc-100/80 text-[#1660C3] px-12 py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors disabled:opacity-50"
             >
-                Cancel Ride
+                {bookingLoading ? 'Cancelling...' : 'Cancel Ride'}
             </button>
         </div>
     );
 
-    const renderCarArriving = () => (
-        <div className="flex flex-col h-full bg-[#F4F4F4] -mx-6 md:-mx-8 -my-8 p-6 md:p-8 overflow-y-auto scrollbar-hide">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-zinc-900">Car Arriving</h2>
-                <span className="text-xs text-zinc-500 font-medium tracking-tight">5 mins away</span>
-            </div>
-
-            {/* Driver Info */}
-            <div className="bg-white p-4 rounded-2xl flex items-center justify-between mb-4 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <img src={driverProfile} alt="Driver" className="w-14 h-14 rounded-full object-cover border-2 border-zinc-100" />
-                    <div>
-                        <h4 className="font-bold text-zinc-900">Sergio Fernandez</h4>
-                        <p className="text-xs text-zinc-400 font-medium">Driver</p>
-                    </div>
-                </div>
-                <div
-                    onClick={() => setSidebarStep('chat')}
-                    className="bg-[#1660C3] text-white p-3 rounded-xl cursor-pointer hover:opacity-90 shadow-lg shadow-blue-100"
-                >
-                    <FaCommentDots className="text-lg" />
-                </div>
-            </div>
-
-            {/* Destination Card */}
-            <div className="bg-white p-6 rounded-2xl mb-4 shadow-sm">
-                <h5 className="font-bold text-zinc-900 mb-4">Destination</h5>
-                <div className="relative pl-8 space-y-8">
-                    {/* Road Line */}
-                    <div className="absolute left-[7px] top-2 bottom-2 w-0.5 border-l-2 border-dashed border-zinc-200" />
-
-                    <div className="relative">
-                        <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-black border-4 border-white shadow-sm" />
-                        <h6 className="text-[14px] font-bold text-zinc-900">Home</h6>
-                        <p className="text-[12px] text-zinc-400 font-medium">2872 Westheimer Rd. Santa Ana, Illinois 85486</p>
-                    </div>
-
-                    <div className="relative">
-                        <div className="absolute -left-[35px] top-1 flex items-center justify-center">
-                            <HiMapPin className="text-2xl text-[#1660C3]" />
-                        </div>
-                        <h6 className="text-[14px] font-bold text-zinc-900">Coffee Shop</h6>
-                        <p className="text-[12px] text-zinc-400 font-medium">8502 Preston Rd. Inglewood, Maine 98380</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Ride Details Card */}
-            <div className="bg-white p-6 rounded-2xl mb-4 shadow-sm">
+    const renderCarArriving = () => {
+        console.log('RENDERING ARRIVING - currentBooking:', currentBooking);
+        return (
+            <div className="flex flex-col h-full bg-[#F4F4F4] -mx-6 md:-mx-8 -my-8 p-6 md:p-8 overflow-y-auto scrollbar-hide">
                 <div className="flex items-center justify-between mb-6">
-                    <h5 className="font-bold text-zinc-900">Ride Details</h5>
-                    <span className="text-[10px] text-zinc-400 font-bold uppercase">Booking ID: 2365</span>
+                    <h2 className="text-xl font-bold text-zinc-900">Car Arriving</h2>
+
                 </div>
 
-                <h6 className="text-sm font-bold text-zinc-800 border-b border-zinc-50 pb-4 mb-4">Riden: SUV(ID: 984-2WRT)</h6>
-
-                <div className="space-y-4">
-                    {[
-                        { label: 'Total Distance', value: '5.8 km' },
-                        { label: 'Total Fare', value: 'C$70' },
-                        { label: 'Discount', value: 'C$0' },
-                        { label: 'Payment Method', value: 'Wallet' }
-                    ].map((item, i) => (
-                        <div key={i} className="flex justify-between items-center pb-2 border-b border-zinc-50 last:border-0 last:pb-0">
-                            <span className="text-xs font-bold text-zinc-400">{item.label}</span>
-                            <span className="text-xs font-bold text-zinc-800">{item.value}</span>
+                {/* Driver Info */}
+                <div className="bg-white p-4 rounded-2xl flex items-center justify-between mb-4 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <img
+                            src={currentBooking?.driver?.avatar_url || currentBooking?.driver?.avatar || driverProfile}
+                            alt="Driver"
+                            className="w-14 h-14 rounded-full object-cover border-2 border-zinc-100 shadow-sm"
+                            onError={(e) => { e.target.src = driverProfile; }}
+                        />
+                        <div>
+                            <h4 className="font-bold text-zinc-900">
+                                {currentBooking?.driver?.first_name ? `${currentBooking.driver.first_name} ${currentBooking.driver.last_name || ''}` : 'Driver Found!'}
+                            </h4>
+                            <p className="text-xs text-zinc-400 font-medium">Verified Driver • {currentBooking?.driver?.gender || 'N/A'}</p>
                         </div>
-                    ))}
+                    </div>
+                    <div
+                        onClick={() => setSidebarStep('chat')}
+                        className="bg-[#1660C3] text-white p-3 rounded-xl cursor-pointer hover:opacity-90 shadow-lg shadow-blue-100"
+                    >
+                        <FaCommentDots className="text-lg" />
+                    </div>
                 </div>
+
+                {/* Destination Card */}
+                <div className="bg-white p-6 rounded-2xl mb-4 shadow-sm">
+                    <h5 className="font-bold text-zinc-900 mb-4">Destination</h5>
+                    <div className="relative pl-8 space-y-8">
+                        {/* Road Line */}
+                        <div className="absolute left-[7px] top-2 bottom-2 w-0.5 border-l-2 border-dashed border-zinc-200" />
+
+                        <div className="relative">
+                            <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-black border-4 border-white shadow-sm" />
+                            <h6 className="text-[14px] font-bold text-zinc-900">Pickup</h6>
+                            <p className="text-[12px] text-zinc-400 font-medium line-clamp-1">{currentBooking?.pickup_address || pickupLoc}</p>
+                        </div>
+
+                        <div className="relative">
+                            <div className="absolute -left-[35px] top-1 flex items-center justify-center">
+                                <HiMapPin className="text-2xl text-[#1660C3]" />
+                            </div>
+                            <h6 className="text-[14px] font-bold text-zinc-900">Dropoff</h6>
+                            <p className="text-[12px] text-zinc-400 font-medium line-clamp-1">{currentBooking?.dropoff_address || dropoffLoc}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Ride Details Card */}
+                <div className="bg-white p-6 rounded-2xl mb-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h5 className="font-bold text-zinc-900">Ride Details</h5>
+                        <span className="text-[10px] text-zinc-400 font-bold uppercase">Booking ID: {currentBooking?.id || currentBooking?.booking_id}</span>
+                    </div>
+
+                    <div className="flex items-center gap-5 p-4 bg-zinc-50 rounded-2xl border border-zinc-100 mb-6">
+                        <div className="bg-white p-2 rounded-xl shadow-sm border border-zinc-50">
+                            <img
+                                src={
+                                    currentBooking?.req_veh_type_id
+                                        ? `https://api.itimium.com.pk/storage/${backendVehicleTypes.find(t => t.id === currentBooking.req_veh_type_id)?.image_path}`
+                                        : selectedCar?.image
+                                }
+                                alt="Vehicle"
+                                className="w-20 h-auto object-contain"
+                                onError={(e) => { e.target.src = selectedCar?.image; }}
+                            />
+                        </div>
+                        <div>
+                            <h6 className="text-sm font-black text-zinc-800 uppercase tracking-tight">
+                                {currentBooking?.vehicle?.model || selectedCar?.name}
+                            </h6>
+                            <div className="flex items-center gap-2">
+                                <p className="text-[10px] text-[#1660C3] font-black uppercase tracking-widest">
+                                    {backendVehicleTypes.find(t => t.id === currentBooking?.req_veh_type_id)?.category || selectedCar?.type}
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-zinc-50/50 p-4 rounded-2xl border border-zinc-100 mb-6">
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                            <div>
+                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-wider block mb-1">Capacity</span>
+                                <span className="text-sm font-bold text-zinc-800">
+                                    {backendVehicleTypes.find(t => t.id === currentBooking?.req_veh_type_id)?.capacity || selectedCar?.capacity} Seats
+                                </span>
+                            </div>
+                            <div>
+                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-wider block mb-1">License Plate</span>
+                                <span className="text-sm font-black text-[#1660C3] tracking-widest uppercase">{currentBooking?.vehicle?.license_plate || 'ASSIGNING'}</span>
+                            </div>
+                            <div>
+                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-wider block mb-1">Color</span>
+                                <span className="text-sm font-bold text-zinc-800">{currentBooking?.vehicle?.color || 'N/A'}</span>
+                            </div>
+                            <div>
+                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-wider block mb-1">Manufacturing Year</span>
+                                <span className="text-sm font-bold text-zinc-800">{currentBooking?.vehicle?.year || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        {[
+                            { label: 'Total Distance', value: `${currentBooking?.estimated_distance || distanceKm} km` },
+                            { label: 'Ride Time', value: `${formatEstimatedTime(currentBooking?.estimated_time) || Math.round(durationMin)} mins` },
+                            { label: 'Total Fare', value: `C$${currentBooking?.fare || getCalculatedPrice(selectedCar?.id)}` },
+                            { label: 'Discount', value: 'C$0' },
+                            { label: 'Payment Method', value: currentBooking?.payment_method || 'Cash' }
+                        ].map((item, i) => (
+                            <div key={i} className="flex justify-between items-center pb-2 border-b border-zinc-50 last:border-0 last:pb-0">
+                                <span className="text-xs font-bold text-zinc-400">{item.label}</span>
+                                <span className="text-xs font-bold text-zinc-800">{item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <button className="flex items-center justify-center gap-4 bg-zinc-100 p-5 rounded-2xl font-bold mb-4 hover:bg-zinc-200 transition-colors">
+                    <div className="bg-[#1660C3] p-2 rounded-lg text-white">
+                        <FaShareAlt className="text-sm" />
+                    </div>
+                    <span className="text-sm text-zinc-800">Share Ride Details</span>
+                </button>
+
+                <button
+                    disabled={bookingLoading}
+                    onClick={async () => {
+                        const bookingId = currentBooking?.id;
+                        if (!bookingId) {
+                            setSidebarStep('details');
+                            return;
+                        }
+                        setBookingLoading(true);
+                        try {
+                            await cancelBooking(bookingId);
+                            setCurrentBooking(null);
+                            setSidebarStep('details');
+                            toast.success('Booking cancelled successfully.');
+                        } catch (err) {
+                            console.error('Cancellation failed', err);
+                            toast.error('Failed to cancel booking.');
+                        } finally {
+                            setBookingLoading(false);
+                        }
+                    }}
+                    className="w-full bg-[#D9E8FF] text-[#1660C3] py-5 rounded-3xl font-bold uppercase tracking-widest text-sm hover:bg-[#C9E1FF] transition-colors disabled:opacity-50"
+                >
+                    {bookingLoading ? 'Cancelling...' : 'Cancel Ride'}
+                </button>
             </div>
-
-            <button className="flex items-center justify-center gap-4 bg-zinc-100 p-5 rounded-2xl font-bold mb-4 hover:bg-zinc-200 transition-colors">
-                <div className="bg-[#1660C3] p-2 rounded-lg text-white">
-                    <FaShareAlt className="text-sm" />
-                </div>
-                <span className="text-sm text-zinc-800">Share Ride Details</span>
-            </button>
-
-            <button
-                onClick={() => setSidebarStep('details')}
-                className="w-full bg-[#D9E8FF] text-[#1660C3] py-5 rounded-3xl font-bold uppercase tracking-widest text-sm hover:bg-[#C9E1FF] transition-colors"
-            >
-                Cancel Ride
-            </button>
-        </div>
-    );
+        );
+    };
 
     const renderChat = () => (
         <div className="flex flex-col h-full -mx-4">
@@ -703,162 +1026,41 @@ const BookingPage = () => {
                 </button>
 
                 <h2 className="text-md audiowide-regular uppercase text-[#0E0E0E] mb-10 pr-8">
-                    Who you want to give this ride?
+                    Choose Rider
                 </h2>
 
                 <div className="space-y-4">
-                    <div className="space-y-2">
-                        <p className="text-[10px] uppercase font-bold text-zinc-400">Phone</p>
-                        <input type="tel" placeholder="+92 XXX XXXXXXX" className="w-full bg-zinc-100 border border-zinc-100 rounded-2xl p-5 outline-none font-medium" />
-                    </div>
-                    <div className="space-y-2">
-                        <p className="text-[10px] uppercase font-bold text-zinc-400">Name</p>
-                        <input type="text" placeholder="Passanger Name" className="w-full bg-zinc-100 border border-zinc-100 rounded-2xl p-5 outline-none font-medium" />
-                    </div>
-                    <button
-                        onClick={() => setStep('phone')}
-                        className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-[1.5rem] font-bold dm-sans uppercase tracking-wider shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2"
-                    >
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-
-    const renderPhoneModal = () => (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-[2rem] p-6 lg:p-7 w-full max-w-[380px] relative animate-in fade-in zoom-in duration-300 md:overflow-visible overflow-y-auto scrollbar-hide max-h-[90vh] md:max-h-none">
-                <button onClick={() => setStep('booking')} className="absolute top-5 right-6 text-blue-500 hover:scale-110 transition-transform">
-                    <HiXMark className="text-xl" />
-                </button>
-
-                <h2 className="text-lg audiowide-regular uppercase text-[#0E0E0E] mb-6">
-                    Sign Up
-                </h2>
-
-                <div className="space-y-4">
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-800 ml-1 uppercase">Full Name</label>
-                        <input
-                            type="text"
-                            placeholder="Enter your name"
-                            className="w-full bg-zinc-100/80 border-none rounded-xl p-3 outline-none text-sm font-medium placeholder:text-zinc-400 focus:bg-zinc-100 transition-all"
-                        />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-800 ml-1 uppercase">Email</label>
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="w-full bg-zinc-100/80 border-none rounded-xl p-3 outline-none text-sm font-medium placeholder:text-zinc-400 focus:bg-zinc-100 transition-all"
-                        />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-800 ml-1 uppercase">Phone Number</label>
-                        <div className="flex bg-zinc-100/80 rounded-xl overflow-hidden">
-                            <div className="flex items-center gap-1.5 px-3 border-r border-zinc-200 cursor-pointer hover:bg-zinc-200/50 transition-colors">
-                                <span className="text-lg">🇨🇦</span>
-
-                            </div>
-                            <input
-                                type="tel"
-                                placeholder="+1 317 7895412"
-                                className="w-full bg-transparent border-none p-3 outline-none text-sm font-medium placeholder:text-zinc-400"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-800 ml-1 uppercase">Password</label>
-                        <div className="relative">
-                            <input
-                                type="password"
-                                placeholder="Enter your password"
-                                className="w-full bg-zinc-100/80 border-none rounded-xl p-3 outline-none text-sm font-medium placeholder:text-zinc-400 focus:bg-zinc-100 transition-all"
-                            />
-                            <button className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
-                                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={() => setStep('otp')}
-                        className="w-full bg-[#1660C3] text-white py-3.5 rounded-xl font-bold uppercase tracking-wider shadow-lg shadow-blue-100 active:scale-95 transition-all mt-1"
-                    >
-                        Continue
-                    </button>
-
-                    <div className="text-center space-y-4 pt-1">
-                        <p className="text-[9px] font-black audiowide-regular uppercase tracking-widest text-zinc-400">
-                            Or log in using
-                        </p>
-
-                        <div className="flex justify-center gap-6">
-                            <button className="hover:scale-110 transition-transform text-[#1660C3]">
-                                <FaGoogle className="text-3xl sm:text-4xl" />
-                            </button>
-                            <button className="hover:scale-110 transition-transform text-black">
-                                <FaApple className="text-3xl sm:text-4xl" />
-                            </button>
-                        </div>
-
-                        <p className="text-[10px] text-zinc-400 leading-tight px-1 uppercase tracking-tighter">
-                            By Clicking Continue, You Accept The <span className="text-[#1660C3] font-bold cursor-pointer">User Agreement</span> & <span className="text-[#1660C3] font-bold cursor-pointer">Privacy Policy</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    const renderOTPModal = () => (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-[2rem] p-10 w-full max-w-md relative animate-in fade-in zoom-in duration-300 text-center">
-                <button onClick={() => setStep('phone')} className="absolute top-8 left-8 text-zinc-400 hover:text-black transition-colors">
-                    <HiArrowLeft className="text-2xl" />
-                </button>
-
-                <h2 className="text-md audiowide-regular uppercase text-[#0E0E0E] mb-4">
-                    ENTER THE 6-DIGIT CODE
-                </h2>
-                <p className="text-zinc-500 dm-sans mb-10">
-                    We sent it to <span className="text-[#0E0E0E] font-bold">+92 317 6062118</span> via SMS
-                </p>
-
-                <div className="space-y-8">
-                    <div className="flex justify-center gap-3">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <input
-                                key={i}
-                                type="text"
-                                maxLength="1"
-                                className="w-12 h-16 bg-zinc-100 border border-zinc-300 rounded-xl text-center text-2xl font-black outline-none focus:border-[#1660C3] transition-colors"
-                            />
-                        ))}
-                    </div>
-
-                    <div className="pt-4">
-                        <p className="text-sm text-zinc-500 mb-2">Didn't receive it?</p>
-                        <button className="text-[#1660C3] font-bold underline uppercase tracking-wider text-xs">
-                            Resend It
-                        </button>
-                    </div>
-
                     <button
                         onClick={() => {
                             setStep('booking');
-                            setSidebarStep('details');
+                            setSidebarStep('request');
                         }}
-                        className="w-full bg-gradient-to-r from-[#1660C3] to-[#2671D8] text-white py-4 rounded-[1.5rem] font-bold dm-sans uppercase tracking-wider shadow-lg shadow-blue-200/50 hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#D9E8FF] border-2 border-[#1660C3] transition-all group"
                     >
-                        Verify & Complete
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#1660C3]">
+                            <FaSmile className="text-xl" />
+                        </div>
+                        <div className="text-left">
+                            <span className="block font-bold text-zinc-900">For Me</span>
+                            <span className="text-xs text-zinc-500">I am the primary rider</span>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setAuthInitialStep('phone');
+                            setIsAuthModalOpen(true);
+                            setStep('booking');
+                        }}
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 border-2 border-zinc-100 hover:border-blue-100 transition-all group"
+                    >
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-zinc-400 group-hover:text-blue-400">
+                            <HiPlusCircle className="text-xl" />
+                        </div>
+                        <div className="text-left">
+                            <span className="block font-bold text-zinc-900">For Someone Else</span>
+                            <span className="text-xs text-zinc-500">Book for a friend or family</span>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -984,8 +1186,16 @@ const BookingPage = () => {
             )}
 
             {step === 'for_whom' && renderForWhomModal()}
-            {step === 'phone' && renderPhoneModal()}
-            {step === 'otp' && renderOTPModal()}
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                initialStep={authInitialStep}
+                onAuthSuccess={() => {
+                    setIsLoggedIn(true);
+                    setIsAuthModalOpen(false);
+                    setSidebarStep('request');
+                }}
+            />
 
             {/* Map Interactive HUD */}
             <div className="absolute top-10 right-10 flex flex-col gap-4 z-10">
@@ -993,7 +1203,7 @@ const BookingPage = () => {
                     <HiMapPin />
                 </button>
             </div>
-            <style jsx>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 5px;
                 }
@@ -1006,6 +1216,26 @@ const BookingPage = () => {
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                     background: #cbd5e1;
+                }
+                /* modal-scroll: scrollbar only on mobile, hidden on desktop */
+                .modal-scroll::-webkit-scrollbar {
+                    width: 5px;
+                }
+                .modal-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .modal-scroll::-webkit-scrollbar-thumb {
+                    background: #dfe7ef;
+                    border-radius: 10px;
+                }
+                .modal-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #cbd5e1;
+                }
+                @media (min-width: 640px) {
+                    .modal-scroll::-webkit-scrollbar {
+                        width: 0;
+                        display: none;
+                    }
                 }
             `}</style>
         </div>

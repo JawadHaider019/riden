@@ -104,7 +104,7 @@ const HeroSection = ({
             {/* Bottom Decorative Element */}
             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent opacity-10"></div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes bounce-slow {
                     0%, 100% {
                         transform: translateY(0);

@@ -443,7 +443,7 @@ const Navbar = () => {
             </div >
 
             {/* Add custom Tailwind animations to your tailwind.config.js */}
-            < style jsx > {`
+            <style>{`
                 @keyframes slideDownFadeIn {
                     from {
                         opacity: 0;
