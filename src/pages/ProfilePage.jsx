@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
-import { clearAuth, getToken, getPassengerProfile, updatePassengerProfile, getUser, saveAuth, logoutPassenger } from '../api/authApi';
+import { getToken, getPassengerProfile, updatePassengerProfile, getUser, saveAuth, logoutPassenger } from '../api/authApi';
 import {
     FaUser,
     FaCreditCard,

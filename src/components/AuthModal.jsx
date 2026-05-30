@@ -7,9 +7,7 @@ import {
 } from 'react-icons/hi2';
 import {
     FaGoogle,
-    FaApple,
-    FaSmile,
-    FaPaperPlane
+    FaApple
 } from 'react-icons/fa';
 import {
     registerPassenger,

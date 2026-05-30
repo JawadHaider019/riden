@@ -17,9 +17,7 @@ import {
     FaCommentDots,
     FaSmile,
     FaPaperPlane,
-    FaChevronLeft,
-    FaGoogle,
-    FaApple
+    FaChevronLeft
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useJsApiLoader, GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
@@ -103,17 +101,7 @@ const reverseGeocode = async (lat, lng) => {
     return null;
 };
 
-const darkGlowStyleFull = [
-    ...darkGlowStyle,
-    { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
-    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#161b22" }] },
-    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
-    { featureType: "road", elementType: "geometry", stylers: [{ color: "#1c2128" }] },
-    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
-    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2d333b" }] },
-    { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#ff0000ff" }] },
-    { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] }
-];
+
 
 const CAR_OPTIONS_DATA = [
     { id: 1, name: 'Economy', type: 'Budget', time: '2 min', capacity: 4, image: standardCar },
@@ -407,7 +395,7 @@ const BookingPage = () => {
             }
         };
         autoCalculateResumed();
-    }, [isLoaded, pickupCoords, dropoffCoords, directionsResponse, map]);
+    }, [isLoaded, pickupCoords, dropoffCoords, directionsResponse, map, drawPolylineOnMap]);
 
     React.useEffect(() => {
         if (map && directionsResponse) {
