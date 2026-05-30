@@ -710,8 +710,8 @@ const BookingPage = () => {
                         setBookingLoading(true);
                         try {
                             const data = {
-                                pickup_address: pickupLoc,
-                                dropoff_address: dropoffLoc,
+                                pickup_address: pickupRef.current?.value || pickupLoc,
+                                dropoff_address: dropoffRef.current?.value || dropoffLoc,
                                 pickup_lat: getCoordValue(pickupCoords, 'lat'),
                                 pickup_lng: getCoordValue(pickupCoords, 'lng'),
                                 dropoff_lat: getCoordValue(dropoffCoords, 'lat'),
