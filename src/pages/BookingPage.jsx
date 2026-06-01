@@ -52,10 +52,12 @@ const VEHICLE_MULTIPLIERS = {
 };
 
 const darkGlowStyle = [
-    { elementType: "geometry", stylers: [{ color: "#0d1117" }] },
+    { elementType: "geometry", stylers: [{ saturation: -100 }] },
     { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-    { elementType: "labels.text.fill", stylers: [{ color: "#4f5b66" }] },
-    { elementType: "labels.text.stroke", stylers: [{ color: "#0d1117" }] },
+    { elementType: "labels.text.fill", stylers: [{ saturation: -100 }, { lightness: 20 }] },
+    { elementType: "labels.text.stroke", stylers: [{ saturation: -100 }, { lightness: 80 }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ lightness: 10 }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ lightness: 80 }] },
 ];
 
 const formatEstimatedTime = (timeStr) => {
@@ -79,6 +81,33 @@ const getCoordValue = (coord, type) => {
     return coord[type];
 };
 
+// Cleans an address: strips Plus Code prefixes and postal codes
+const cleanAddress = (address) => {
+    if (!address) return '';
+    // Strip Plus Code prefix like "7355+P8Q," or "WQ64+83H "
+    let cleaned = address.replace(/^[A-Z0-9]{4,}\+[A-Z0-9]{2,},?\s*/i, '');
+    // Strip postal/zip codes (standalone 4-6 digit numbers)
+    cleaned = cleaned.replace(/,?\s*\b\d{4,6}\b/g, '');
+    // Clean up any leftover leading commas or whitespace
+    cleaned = cleaned.replace(/^,\s*/, '').replace(/,\s*,/g, ',').trim();
+    return cleaned;
+};
+
+// Builds a friendly address: prepends place name if available
+const buildFriendlyAddress = (place) => {
+    const raw = place.formatted_address || place.name || '';
+    const cleaned = cleanAddress(raw);
+    // If place.name exists and isn't already part of the formatted address, prepend it
+    if (place.name && !cleaned.toLowerCase().startsWith(place.name.toLowerCase())) {
+        // Make sure place.name itself isn't a Plus Code
+        const nameLooksLikePlusCode = /^[A-Z0-9]{4,}\+/i.test(place.name);
+        if (!nameLooksLikePlusCode) {
+            return `${place.name}, ${cleaned}`;
+        }
+    }
+    return cleaned;
+};
+
 const reverseGeocode = async (lat, lng) => {
     if (!window.google?.maps?.Geocoder) return null;
     const geocoder = new window.google.maps.Geocoder();
@@ -88,12 +117,19 @@ const reverseGeocode = async (lat, lng) => {
             language: 'en'
         });
         if (response.results) {
-            // Filter out Plus Codes and try to find a real address
-            const streetResult = response.results.find(res =>
+            // Filter out Plus Code results entirely
+            const validResults = response.results.filter(res =>
                 !res.types.includes('plus_code') &&
-                !res.formatted_address.includes('+')
+                !/^[A-Z0-9]{4,}\+/i.test(res.formatted_address)
             );
-            return streetResult ? streetResult.formatted_address : response.results[0].formatted_address;
+
+            // Prefer results that include an establishment/POI name
+            const poiResult = validResults.find(res =>
+                res.types.some(t => ['establishment', 'point_of_interest', 'premise', 'subpremise'].includes(t))
+            );
+
+            const best = poiResult || validResults[0] || response.results[0];
+            return cleanAddress(best.formatted_address);
         }
     } catch (err) {
         console.error('Geocoding failed', err);
@@ -458,7 +494,7 @@ const BookingPage = () => {
                                     if (pickupAutocomplete) {
                                         const place = pickupAutocomplete.getPlace();
                                         if (place.geometry) {
-                                            const addr = place.formatted_address || place.name;
+                                            const addr = buildFriendlyAddress(place);
                                             setPickupLoc(addr);
                                             lastValidPickup.current = addr;
                                             setPickupCoords(place.geometry.location);
@@ -500,7 +536,7 @@ const BookingPage = () => {
                                                 if (auto) {
                                                     const place = auto.getPlace();
                                                     if (place.geometry) {
-                                                        const addr = place.formatted_address || place.name;
+                                                        const addr = buildFriendlyAddress(place);
                                                         setStopsList(stopsList.map(s => s.id === stop.id ? { ...s, val: addr } : s));
                                                         calculateRoute();
                                                     }
@@ -534,7 +570,7 @@ const BookingPage = () => {
                                     if (dropoffAutocomplete) {
                                         const place = dropoffAutocomplete.getPlace();
                                         if (place.geometry) {
-                                            const addr = place.formatted_address || place.name;
+                                            const addr = buildFriendlyAddress(place);
                                             setDropoffLoc(addr);
                                             lastValidDropoff.current = addr;
                                             setDropoffCoords(place.geometry.location);
